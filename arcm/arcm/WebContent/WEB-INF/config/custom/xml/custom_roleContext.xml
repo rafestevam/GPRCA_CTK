@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<custom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/custom.xsd">
+
+	<ruleContext objectType="RISKASSESSMENT" ruleSet.idrefs="rs_racustom"/>
+	
+	<ruleSet id="rs_racustom" drl="riskassessment.drl" dsl="custom_riskassessment.dsl"/>
+
+</custom>

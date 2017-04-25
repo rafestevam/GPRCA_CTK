@@ -1,4 +1,4 @@
-package com.idsscheer.webapps.arcm.ui.components.issuemanagement.actioncommands;
+package src.com.idsscheer.webapps.arcm.ui.components.issuemanagement.actioncommands;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -18,7 +18,7 @@ import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
 
-public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
+public class CustomIssueSaveActionCommand_bkp extends IssueSaveActionCommand  {
 	
 	private static final com.idsscheer.batchserver.logging.Logger debuglog = new com.idsscheer.batchserver.logging.Logger();	
 	private static final boolean DEBUGGER_ON = true;
@@ -66,90 +66,38 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 					IDateAttribute dataFim = iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE);								
 					Date dataFimValue = dataFim.getRawValue();
 							
-					IDateAttribute dataIni = currIssueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PLANDTINI);
-					Date dataPlanIni = dataIni.getRawValue();
-					
 					Boolean breplaned = currIssueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).getRawValue();
 					this.displayLog("Status Replanejado : " + breplaned);					
-					 
-					Long s_resch = currIssueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_RESCHEDULING).getRawValue();
-					this.displayLog("Reschedule  : " + s_resch );
-			
 					
+
 					this.displayLog("Data fim : " + issueendtateValue );
 					
 					if(breplaned == true){
-						
-						if(dataPlanIni==null){
-							dataPlanIni = currDataFimValue;
-							this.displayLog("Data Inicial do Planejado : " + currDataFimValue );
-							currIssueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PLANDTINI).setRawValue(currDataFimValue);
-							
-						}
+					
 
 					this.displayLog("DaTa issue date : " + issueendtateValue );
 
 					if(actplnenddateValue.after(issueendtateValue)){
 					
 						iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_PLANNEDENDDATE).setRawValue(actplnenddateValue);
-						//iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
+						iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
 					}
-					this.displayLog("Replanejado : " +  breplaned );
-					iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
+					
 					this.displayLog("Data DataFim corrente : " + currDataFimValue );
 
-					s_resch += 1;
-					this.displayLog("numero vezes + 1 : " + s_resch );
-					
-					this.displayLog("Quantidade de replanejamentos : " + s_resch);
-					currIssueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_RESCHEDULING).setRawValue(s_resch);
-					
 					if(currDataFimValue.after(dataFimValue)){
 
 						iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(currDataFimValue);
-						
+						iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
 						this.displayLog("Data Replanejada : " + currDataFimValue );
-						
+//						this.formModel.addControlInfoMessage(NotificationTypeEnum.INFO, "Nova Data do apontamento..: " + currDataFimValue , new String[] { getStringRepresentation(this.formModel.getAppObj()) });
 					}
-					
-					issueFacade.save(currIssueAppObj, this.getDefaultTransaction(), true);
-					issueFacade.releaseLock(currIssueAppObj.getVersionData().getHeadOVID());
 
 					issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);
 					issueFacade.releaseLock(iroUpdObj.getVersionData().getHeadOVID());
-
-					break;
-					
-					}else{
-						
-						this.displayLog("DaTa issue date : " + issueendtateValue );
-
-						if(actplnenddateValue.after(issueendtateValue)){
-						
-							iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_PLANNEDENDDATE).setRawValue(actplnenddateValue);
-							//iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
-						}
-						
-						this.displayLog("Data DataFim corrente : " + currDataFimValue );
-
-						if(currDataFimValue.after(dataFimValue)){
-
-							iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(currDataFimValue);
-						//	iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
-							this.displayLog("Data Atualizada : " + currDataFimValue );
-
-						}
-
-						issueFacade.save(currIssueAppObj, this.getDefaultTransaction(), true);
-						issueFacade.releaseLock(currIssueAppObj.getVersionData().getHeadOVID());
-						
-						issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);
-						issueFacade.releaseLock(iroUpdObj.getVersionData().getHeadOVID());
-
-						break;	
-						
+//					this.formModel.addControlInfoMessage(NotificationTypeEnum.INFO, "Passei facede Data apontamento " + currDataFimValue , new String[] { getStringRepresentation(this.formModel.getAppObj()) });
+					break;					
 					}
-					
 				}
 			}catch(Exception e){
 				this.formModel.addControlInfoMessage(NotificationTypeEnum.INFO, e.getMessage() , new String[] { getStringRepresentation(this.formModel.getAppObj()) });

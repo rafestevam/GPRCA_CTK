@@ -32,11 +32,9 @@ import com.idsscheer.webapps.arcm.services.framework.batchserver.services.jobs.J
 
 @CanBeScheduled
 public class IssueSLAUpdateJob extends BaseJob {
-	// public static final String KEY_JOB_NAME =
-	// EnumerationsCustom.CUSTOM_JOBS.ISSUESPENDING.getPropertyKey();
-
 	private static final boolean DEBUGGER_ON = true;
-	public static final String KEY_JOB_NAME = EnumerationsCustom.CUSTOM_JOBS.ISSUE_SLA.getPropertyKey();
+//	public static final String KEY_JOB_NAME = EnumerationsCustom.CUSTOM_JOBS.ISSUE_SLA.getPropertyKey();
+	public static final String KEY_JOB_NAME = "Teste";
 	private static final int ISSUE_SLA = 15; // Número de dias de SLA.
 	
 	private static final com.idsscheer.batchserver.logging.Logger logger = new com.idsscheer.batchserver.logging.Logger();
@@ -176,28 +174,28 @@ public class IssueSLAUpdateJob extends BaseJob {
 								this.displayLog("eiRelIssueAction == EnumerationsCustom.CENUM_IS_ACTION_TYPE.actiontype1");
 								
 								// Cria um enumeration attribute para o creator status do apontamento.
-								IEnumAttribute eaRelIssueCreatorStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_AP_CREATOR_STATUS );
-								this.displayLog("IEnumAttribute eaRelIssueCreatorStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_AP_CREATOR_STATUS )");
+								IEnumAttribute eaRelIssueCreatorStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_IS_CREATOR_STATUS );
+								this.displayLog("IEnumAttribute eaRelIssueCreatorStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_IS_CREATOR_STATUS )");
 								
 								// Cria um enumeration item para o owner status dos apontamentos relevantes.
 								IEnumerationItem eiRelIssueCreatorStatus = ARCMCollections.extractSingleEntry(eaRelIssueCreatorStatus.getRawValue(), true);
 								this.displayLog("IEnumerationItem eiRelIssueCreatorStatus = ARCMCollections.extractSingleEntry(eaRelIssueCreatorStatus.getRawValue(), true)");
 								
 								// Cria um enumeration attribute para o owner status do apontamento.
-								IEnumAttribute eaRelIssueOwnerStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_AP_OWNER_STATUS );
-								this.displayLog("IEnumAttribute eaRelIssueOwnerStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_AP_OWNER_STATUS )");
+								IEnumAttribute eaRelIssueOwnerStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_IS_OWNER_STATUS );
+								this.displayLog("IEnumAttribute eaRelIssueOwnerStatus = objUpdRelIssue.getAttribute( IIssueAttributeTypeCustom.ATTR_IS_OWNER_STATUS )");
 								
 								// Cria um enumeration item para o owner status dos apontamentos relevantes.
 								IEnumerationItem eiRelIssueOwnerStatus = ARCMCollections.extractSingleEntry(eaRelIssueOwnerStatus.getRawValue(), true);
 								this.displayLog("IEnumerationItem eiRelIssueOwnerStatus = ARCMCollections.extractSingleEntry(eaRelIssueOwnerStatus.getRawValue(), true)");
 								
-								if ( eiRelIssueCreatorStatus == EnumerationsCustom.CENUM_AP_CREATOR_STATUS.IN_PROGRESS && 
-										eiRelIssueOwnerStatus == EnumerationsCustom.CENUM_AP_OWNER_STATUS.IN_PROGRESS ) {
+								if ( eiRelIssueCreatorStatus == EnumerationsCustom.CENUM_IS_CREATOR_STATUS.IN_REVIEW ) { 
+//								     eiRelIssueOwnerStatus == EnumerationsCustom.CENUM_IS_OWNER_STATUS.OPEN	 ) {
 
-									this.displayLog("o apontamento relacionado a este plano de ação deverá alternar o seu status de proprietário para PENDENTE.");
+									this.displayLog("o apontamento relacionado a este plano de ação deverá alternar o seu status de proprietário para EM ANDAMENTO.");
 									
-									objUpdRelIssue.getAttribute(IIssueAttributeTypeCustom.ATTR_AP_OWNER_STATUS).setRawValue(
-											Collections.singletonList(EnumerationsCustom.CENUM_AP_OWNER_STATUS.PENDING));
+									objUpdRelIssue.getAttribute(IIssueAttributeTypeCustom.ATTR_IS_OWNER_STATUS).setRawValue(
+											Collections.singletonList(EnumerationsCustom.CENUM_IS_OWNER_STATUS.OPEN ));
 
 									facade.save(objUpdRelIssue, this.getInternalTransaction(), true);
 

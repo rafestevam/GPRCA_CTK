@@ -39,7 +39,6 @@ import com.idsscheer.webapps.arcm.common.constants.metadata.EnumerationsCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.EnumerationsCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
-import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeTypeCustom;
@@ -56,7 +55,8 @@ import com.idsscheer.webapps.arcm.services.framework.batchserver.services.jobs.J
 
 @CanBeScheduled
 public class IssuePendingUpdateJob extends BaseJob {
-	public static final String KEY_JOB_NAME = EnumerationsCustom.CUSTOM_JOBS.ISSUE_PENDING.getPropertyKey();
+//	public static final String KEY_JOB_NAME = EnumerationsCustom.CUSTOM_JOBS.ISSUE_PENDING.getPropertyKey();
+	public static final String KEY_JOB_NAME = "Teste";
 	private static final com.idsscheer.batchserver.logging.Logger logger = new com.idsscheer.batchserver.logging.Logger();
 
 	public IssuePendingUpdateJob(IOVID executingUser, Locale executingLocale) {

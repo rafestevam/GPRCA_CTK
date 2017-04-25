@@ -1,12 +1,10 @@
-package com.idsscheer.webapps.arcm.ui.components.issuemanagement.actioncommands;
+package src.com.idsscheer.webapps.arcm.ui.components.issuemanagement.actioncommands;
 
 import java.util.Iterator;
 import java.util.List;
 
-import com.idsscheer.webapps.arcm.bl.datatransport.xml.xmlimport.parsing.validation.IHierarchicalImportObject;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObjFacade;
-import com.idsscheer.webapps.arcm.bl.models.objectmodel.IHierarchyAppObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IEnumAttribute;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IListAttribute;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
@@ -21,7 +19,7 @@ import com.idsscheer.webapps.arcm.common.notification.NotificationTypeEnum;
 import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
-public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
+public class CustomIssueGetRiskActionCommand2 extends IssueCacheActionCommand{
 
 	private static final com.idsscheer.batchserver.logging.Logger debuglog = new com.idsscheer.batchserver.logging.Logger();	
 	private static final boolean DEBUGGER_ON = true;
@@ -69,9 +67,9 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PROCESS).setRawValue(sprocess);
 						
 						String smodelname = pcObj.getAttribute(IHierarchyAttributeType.ATTR_MODEL_NAME).getRawValue();
-						this.displayLog("Processo:"+ smodelname );				
-						
-						
+						this.displayLog("Processo:"+ smodelname );
+				
+					
 						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_MODELNAME).setRawValue(smodelname);
 						this.displayLog("Objeto relevan: " + String.valueOf(pcObj.getAttribute(IHierarchyAttributeType.ATTR_MODEL_NAME )));	
 					}

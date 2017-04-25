@@ -39,12 +39,11 @@
 
         </listAttrType>
 
-
-				<!-- Customizations of GAU01 -->
-				<listAttrType id="risk" maxSize="1" objectType.idref="RISK" linkType="21001">
+    <!-- Customizations of GAU01 -->
+    <listAttrType id="risk" maxSize="1" objectType.idref="RISK" linkType="21001">
             <!-- Add List Restrictions -->
         </listAttrType>
-				<listAttrType id="methodology" maxSize="1" objectType.idref="HIERARCHY" linkType="21002">
+    <listAttrType id="methodology" maxSize="1" objectType.idref="HIERARCHY" linkType="21002">
             <!-- Add List Restrictions -->
             <listRestriction>
                 <attributeRestriction attribute="type" value="financialaccount"/>

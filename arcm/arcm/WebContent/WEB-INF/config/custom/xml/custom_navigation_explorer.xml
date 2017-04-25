@@ -153,7 +153,13 @@
                 <nav.access.privilege objectPrivilege="CREATE"/>
             </nav.access>
         </nav.data.grid>
-        
+        <!-- GAP-GRC104 -->
+        <nav.data.grid dataGrid.idref="ReportIssues">
+            <nav.access>
+                <nav.access.privilege objectPrivilege="CREATE"/>
+            </nav.access>
+        </nav.data.grid>
+        <!-- GAP-GRC104 -->
         <!-- for issue manager, issue auditor -->
         <nav.data.grid dataGrid.idref="Issues3">
             <nav.access>

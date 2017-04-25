@@ -53,12 +53,11 @@
                 <attributeRestriction attribute="type" value="applicationsystemtype"/>
             </listRestriction>
         </listAttrType>
-
-				<!-- Customizations of GAU01 -->
-				
-				<textAttrType id="percentage_completed"/>
-				
-				<listAttrType id="area" maxSize="1" objectType.idref="HIERARCHY" linkType="21005"> <!-- linktype? -->
+    <!-- Customizations of GAU01 -->
+    
+    <longAttrType id="percentage_completed" defaultValue="0" precision="3:0"/>
+    
+    <listAttrType id="area" maxSize="1" objectType.idref="HIERARCHY" linkType="21005"> <!-- linktype? -->
             <listRestriction>
                 <attributeRestriction attribute="type" value="orgunit"/>
             </listRestriction>
@@ -76,8 +75,7 @@
             </listRestriction>
         </listAttrType>
         <listAttrType id="control" objectType.idref="CONTROL" linkType="21008"/>
-				<!-- End of Customizations of GAU01 -->
-
+    		<!-- End of Customizations of GAU01 -->
         <!-- Doc-Name: Audit step owner group-->
         <!-- inheritance attribute taken from RECURRING: owner_group -->
         <listAttrType id="owner_group" maxSize="1" objectType.idref="USERGROUP" linkType="5280">

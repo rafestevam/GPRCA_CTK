@@ -55,9 +55,8 @@
                 <attributeRestriction attribute="type" value="applicationsystemtype"/>
             </listRestriction>
         </listAttrType>
-
-				<!-- Customizations of GAU01 -->
-				<listAttrType id="risk" maxSize="1" objectType.idref="RISK" linkType="21009">
+    <!-- Customizations of GAU01 -->
+    <listAttrType id="risk" maxSize="1" objectType.idref="RISK" linkType="21009">
             <!-- Add List Restrictions -->
         </listAttrType>
 				<listAttrType id="methodology" maxSize="1" objectType.idref="HIERARCHY" linkType="21010">

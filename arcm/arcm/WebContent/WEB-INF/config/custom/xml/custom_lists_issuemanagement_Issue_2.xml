@@ -12,13 +12,10 @@
          propertyKey="list.Issues2.DBI">
         <roleRestriction role="issuemanager"/>
         <roleRestriction role="issueauditor"/>
+
         <simpleFilterRow>
             <simpleFilter filterRow.idref="IssueID"/>
-            <simpleFilter filterRow.idref="remediationPlannedBefore"/>
-        </simpleFilterRow>
-        <simpleFilterRow>
-            <simpleFilter filterRow.idref="name"/>
-            <simpleFilter filterRow.idref="description"/>
+            <simpleFilter filterRow.idref="remediationPlannedBefore"/> 
         </simpleFilterRow>
         <simpleFilterRow>
             <simpleFilter filterRow.idref="creator_status"/>
@@ -44,23 +41,51 @@
             <extendedFilter filterRow.idref="created_by_testcase"/>
             <extendedFilter filterRow.idref="deactivated"/>
         </extendedFilterRow>
-        <listHeaderRow>
-            <listHeader column="LC_Issues_1" propertyKey="tableheader.issue.id.DBI" width="8%"/>
-            <listHeader column="LC_Issues_2" propertyKey="tableheader.issue.action_type.DBI" width="12%"/>
-            <listHeader column="LC_Issues_3" propertyKey="tableheader.issue.name.DBI" width="11%"/>
-            <listHeader column="LC_Issues_13" propertyKey="tableheader.issue.recurrent.DBI" width="5%"/>
-            <listHeader column="LC_Issues_14" propertyKey="tableheader.issue.process_environment.DBI" width="8%"/>
-            <listHeader column="LC_Issues_15" propertyKey="tableheader.issue.business_unit.DBI" width="5%"/>
-            <listHeader column="LC_Issues_16" propertyKey="tableheader.issue.root_cause.DBI" width="18%"/>
-            <listHeader column="LC_Issues_4" propertyKey="tableheader.issue.priority.DBI" width="5%"/>
-            <listHeader column="LC_Issues_5" propertyKey="tableheader.issue.creator.DBI" width="10%"/>
-            <listHeader column="LC_Issues_6" propertyKey="tableheader.issue.remedationPlannedBefore.short.DBI" tooltip="tableheader.issue.remedationPlannedBefore.DBI" width="8%"/>
-            <listHeader column="LC_Issues_12" propertyKey="tableheader.issue.creatorStatus.short.DBI" tooltip="tableheader.issue.creatorStatus.DBI" width="5%"/>
-            <listHeader column="LC_Issues_7" propertyKey="tableheader.issue.ownerStatus.short.DBI" tooltip="tableheader.issue.ownerStatus.DBI" width="5%"/>
-            <listHeader column="LC_Issues_8" propertyKey="tableheader.issue.reviewerStatus.short.DBI" tooltip="tableheader.issue.reviewerStatus.DBI" width="5%"/>
-            <listHeader column="LC_Issues_9" propertyKey="tableheader.issue.stateTime.short.DBI" tooltip="tableheader.issue.stateTime.DBI" width="8%"/>
-            <listHeader column="LC_Issues_10" propertyKey="tableheader.description" width="18%"/>
-            <listHeader column="LC_Issues_11" propertyKey="tableheader.issue.remediationMeasure.DBI" width="17%"/>
+
+	   	<extendedFilterRow>
+            <extendedFilter filterRow.idref="rsk_name"/>
+       	</extendedFilterRow>
+
+	   	<extendedFilterRow>
+            <extendedFilter filterRow.idref="cst_modelname"/>
+            <extendedFilter filterRow.idref="cst_process"/>
+       	</extendedFilterRow>
+       	
+       	<extendedFilterRow>
+       		<extendedFilter filterRow.idref="process_environment"/>
+       		<extendedFilter filterRow.idref="business_unit"/>
+       	</extendedFilterRow>
+       	
+         <listHeaderRow>
+            <listHeader column="LC_Issues_1" propertyKey="tableheader.issue.id.DBI" width="5%"/>
+            <listHeader column="LC_Issues_2" propertyKey="tableheader.issue.action_type.DBI" width="5%"/>
+            <listHeader column="LC_Issues_3" propertyKey="tableheader.issue.name.DBI" width="5%"/>
+            <listHeader column="LC_Issues_13" propertyKey="tableheader.issue.recurrent.DBI" width="3%"/>
+            <listHeader column="LC_Issues_14" propertyKey="tableheader.issue.process_environment.DBI" width="3%"/>
+            <listHeader column="LC_Issues_15" propertyKey="tableheader.issue.business_unit.DBI" width="3%"/>
+            <listHeader column="LC_Issues_16" propertyKey="tableheader.issue.root_cause.DBI" width="10%"/>
+            <listHeader column="LC_Issues_4" propertyKey="tableheader.issue.priority.DBI" width="3%"/>
+            <listHeader column="LC_Issues_5" propertyKey="tableheader.issue.creator.DBI" width="3%"/>
+            <listHeader column="LC_Issues_6" propertyKey="tableheader.issue.remedationPlannedBefore.short.DBI" tooltip="tableheader.issue.remedationPlannedBefore.DBI" width="3%"/>
+            <listHeader column="LC_Issues_12" propertyKey="tableheader.issue.creatorStatus.short.DBI" tooltip="tableheader.issue.creatorStatus.DBI" width="3%"/>
+            <listHeader column="LC_Issues_7" propertyKey="tableheader.issue.ownerStatus.short.DBI" tooltip="tableheader.issue.ownerStatus.DBI" width="3%"/>
+            <listHeader column="LC_Issues_8" propertyKey="tableheader.issue.reviewerStatus.short.DBI" tooltip="tableheader.issue.reviewerStatus.DBI" width="3%"/>
+            <listHeader column="LC_Issues_9" propertyKey="tableheader.issue.stateTime.short.DBI" tooltip="tableheader.issue.stateTime.DBI" width="5%"/>
+            <listHeader column="LC_Issues_10" propertyKey="tableheader.description.DBI" width="8%"/>
+            <listHeader column="LC_Issues_11" propertyKey="tableheader.issue.remediationMeasure.DBI" width="8%"/>            
+            <listHeader column="LC_Issues_17" propertyKey="tableheader.issue.replanned.DBI" width="4%"/>
+			<listHeader column="LC_Issues_18" propertyKey="tableheader.issue.risk_name.DBI" width="4%"/>
+			<listHeader column="LC_Issues_19" propertyKey="tableheader.issue.ra_result.DBI" width="4%"/>
+			<listHeader column="LC_Issues_20" propertyKey="tableheader.issue.ra_residualfinal.DBI" width="5%"/>
+			<listHeader column="LC_Issues_21" propertyKey="tableheader.issue.cst_modelname.DBI" width="5%"/> 
+			<listHeader column="LC_Issues_22" propertyKey="tableheader.issue.cst_process.DBI" width="5%"/>    
+			<listHeader column="LC_Issues_23" propertyKey="tableheader.issue.owner_name.DBI" width="5%"/>		 
+			<listHeader column="LC_Issues_24" propertyKey="tableheader.issue.reviewer_name.DBI" width="2%"/>  
+			<listHeader column="LC_Issues_25" propertyKey="tableheader.issue.cst_rescheduling.DBI" width="2%"/>
+			<listHeader column="LC_Issues_26" propertyKey="tableheader.issue.cst_plandtini.DBI" width="2%"/>
+			<listHeader column="LC_Issues_27" propertyKey="tableheader.issue.cst_aging_plan.DBI" width="2%"/>
+			<listHeader column="LC_Issues_28" propertyKey="tableheader.issue.cst_aging_pend.DBI" width="2%"/>						        
+			   
         </listHeaderRow>
         <column id="LC_Issues_1" dataReference.idref="IssueID" template="openObject">
             <parameter name="idColumn" value="IssueID"/>
@@ -97,6 +122,19 @@
         </column>
         <column id="LC_Issues_10" dataReference.idref="description"/>
         <column id="LC_Issues_11" dataReference.idref="remediationMeasure"/>
+        <column id="LC_Issues_17" dataReference.idref="replanned" />
+		<column id="LC_Issues_18" dataReference.idref="rsk_name" />
+		<column id="LC_Issues_19" dataReference.idref="ra_result" />
+		<column id="LC_Issues_20" dataReference.idref="ra_residualfinal" />
+		<column id="LC_Issues_21" dataReference.idref="cst_modelname" /> 
+		<column id="LC_Issues_22" dataReference.idref="cst_process" />
+		<column id="LC_Issues_23" dataReference.idref="owner_name" />		
+		<column id="LC_Issues_24" dataReference.idref="reviewer_name" /> 
+		<column id="LC_Issues_25" dataReference.idref="cst_rescheduling" /> 
+		<column id="LC_Issues_26" dataReference.idref="cst_plandtini" /> 		
+		<column id="LC_Issues_27" dataReference.idref="cst_aging_plan"/>
+		<column id="LC_Issues_28" dataReference.idref="cst_aging_pend"/>
+		
         <listButtons>
             <buttonReference button.idref="LIST_CREATE"/>
             <buttonReference button.idref="LIST_OPEN"/>

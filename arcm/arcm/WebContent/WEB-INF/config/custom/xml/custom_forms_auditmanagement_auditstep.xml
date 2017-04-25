@@ -39,7 +39,7 @@
                 </row>
             </rowGroup>
                 -->
-                
+               
                 <row id="area">
                     <element attribute.idref="area">
                         <parameter name="selectionList" value="AUTO:ignoreRoleRestriction=true"/>
@@ -69,11 +69,13 @@
                     </element>
                 </row>
                 <!-- End of Customizations of GAU01 -->
-                
+               
             </rowGroup>
             <rowGroup id="audit_step.2">
-            		<row id="percentage_completed">
-                    <element attribute.idref="percentage_completed"/>
+              <row id="percentage_completed">
+                    <element attribute.idref="percentage_completed">
+                     <parameter name="size" value="10"/>
+                    </element>
                 </row>
                 <row id="obj_id">
                     <element attribute.idref="obj_id"/>

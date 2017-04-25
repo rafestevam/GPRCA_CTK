@@ -4,7 +4,7 @@
  <filter id="issues2" dataSource.idref="Issues2">
         <filterRow id="IssueID" propertyKey="filter.row.issue.id.DBI">
             <filterElement dataReference.idref="IssueID"/>
-        </filterRow>
+        </filterRow>                        
         <filterRow id="name">
             <filterElement dataReference.idref="name"/>
         </filterRow>
@@ -55,13 +55,36 @@
         <filterRow id="created_by_testcase">
             <filterElement dataReference.idref="created_by_testcase" default="-1"  >
                 <parameter name="showAll" value="true"/>
-            </filterElement>
-           
+            </filterElement>           
         </filterRow>
         <filterRow id="deactivated">
             <filterElement dataReference.idref="deactivated">
                 <parameter name="showAll" value="false"/>
             </filterElement>
         </filterRow>
+        
+        <filterRow id="rsk_name" propertyKey="filter.row.issue.rsk_name.DBI">
+        	<filterElement dataReference.idref="rsk_name"/>
+        </filterRow>
+        
+        <filterRow id="cst_modelname" propertyKey="filter.row.issue.cst_modelname.DBI">
+        	<filterElement dataReference.idref="cst_modelname"/>
+        </filterRow>
+        
+		<filterRow id="cst_process" propertyKey="filter.row.issue.cst_process.DBI">
+        	<filterElement dataReference.idref="cst_process"/>
+        </filterRow>
+        
+        
+		<filterRow id="process_environment" propertyKey="filter.row.issue.process_environment.DBI">
+        	<filterElement dataReference.idref="process_environment"/>
+        </filterRow>
+        
+        <filterRow id="business_unit" propertyKey="filter.row.issue.business_unit.DBI">
+        	<filterElement dataReference.idref="business_unit"/>
+        </filterRow>
+        
+        
+                
     </filter>
 </custom>    

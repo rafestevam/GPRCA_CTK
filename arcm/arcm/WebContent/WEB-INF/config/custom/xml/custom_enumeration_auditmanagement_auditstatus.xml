@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<custom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/custom.xsd">
-	
+<custom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/custom.xsd">	
 	<enum id="auditstatus" isMultiple="false" type="Number" itemClass="ColoredEnumerationItem">
+		
         <enumitem id="all" value="-1" extendedMeaning="all" />
         <enumitem id="open" value="-2" evaluationRelevant="false" virtualScope.idrefs="in_preparation,released,in_progress" />
         <enumitem id="closed" value="-3" evaluationRelevant="false" virtualScope.idrefs="conform,notconform,notauditable,notcompleted" />
-       
 
         <!-- workflow states -->
         <enumitem id="incomplete" value="-5" evaluationRelevant="false" virtualScope.idrefs="notauditable,notcompleted" filterRelevant="false"/>
@@ -34,5 +33,7 @@
             <parameter name="Background" value="EBB585"/>  <!-- orange -->
         </enumitem>
     </enum>
+
 	
 	</custom>
+

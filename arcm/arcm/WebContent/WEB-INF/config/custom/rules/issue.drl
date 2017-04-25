@@ -652,6 +652,7 @@ rule "custom_GRC66_is_in_progress [I,V]"
 		set "plannedenddate"          editable
 		set "owners"                  editable
 		set "reviewers"               editable
+		
 
         set "plannedenddate"          mandatory
 		set "owners"                  mandatory
@@ -674,6 +675,7 @@ rule "custom_GRC66_ap_in_progress [I,V]"
 		set "plannedenddate"          editable
 		set "owners"                  editable
 		set "reviewers"               editable
+		set "replanned"               editable  #GAP - GRC74 2304
 
         set "plannedenddate"          mandatory
 		set "owners"                  mandatory
@@ -748,7 +750,9 @@ rule "custom_GRC66_ap opened by reviewer, still editable --> init [I,V]"
 	
 #		set "reviewer_status" editable
 		set "reviewer_remark" editable
-		set "documents"       editable
+		set "documents"       editable	
+		set "plannedenddate"  editable
+		set "replanned"       editable  #GAP - GRC74 2304
 		
 #		set "reviewer_status" mandatory
 
@@ -769,6 +773,7 @@ rule "custom_GRC66_is opened by reviewer, remediation planned before editable [I
 	when
 	    is in workflow state "openForReview"
 		user is assigned in list "reviewers"
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "issue"
 		value comparison fulfilled: ":transient:" attr_value "custom_is_reviewer_status" "CONTAINS" value "fup"
 #		value comparison fulfilled: ":transient:" attr_value "reviewer_status" "CONTAINS" value "not_approved"
 
@@ -785,6 +790,7 @@ rule "custom_GRC66_ap opened by reviewer, remediation planned before editable [I
 	when
 	    is in workflow state "apOpenForReview"
 		user is assigned in list "reviewers"
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "actionplan"
 		value comparison fulfilled: ":transient:" attr_value "custom_ap_reviewer_status" "CONTAINS" value "fup"
 #		value comparison fulfilled: ":transient:" attr_value "reviewer_status" "CONTAINS" value "not_approved"
 
@@ -817,13 +823,12 @@ rule "custom_GRC66_is opened by reviewer and not disagreed => plannedenddate + s
 	when
 	    is in workflow state "openForReview"
 		user is assigned in list "reviewers"
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "issue"
 		value comparison fulfilled: ":transient:" attr_value "custom_is_reviewer_status" "CONTAINS NOT" value "fup"
 #		value comparison fulfilled: ":transient:" attr_value "reviewer_status" "CONTAINS NOT" value "not_approved"
 
 	then
-		reset "plannedenddate" to persistent value
-		reset "stateTime" to persistent value
-		set "plannedenddate" readonly
+		set "plannedenddate" editable
 
 end
 
@@ -835,13 +840,12 @@ rule "custom_GRC66_ap opened by reviewer and not disagreed => plannedenddate + s
 	when
 	    is in workflow state "apOpenForReview"
 		user is assigned in list "reviewers"
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "actionplan"
 		value comparison fulfilled: ":transient:" attr_value "custom_ap_reviewer_status" "CONTAINS NOT" value "fup"
 #		value comparison fulfilled: ":transient:" attr_value "reviewer_status" "CONTAINS NOT" value "not_approved"
 
 	then
-		reset "plannedenddate" to persistent value
-		reset "stateTime" to persistent value
-		set "plannedenddate" readonly
+		set "plannedenddate" editable
 
 end
 
@@ -853,13 +857,12 @@ rule "custom_GRC66_ap2 opened by reviewer and not disagreed => plannedenddate + 
 	when
 	    is in workflow state "apOpenForReview"
 		user is assigned in list "reviewers"
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "actionplan"
 		value comparison fulfilled: ":transient:" attr_value "custom_ap_reviewer_status" "CONTAINS NOT" value "risk_assumed"
 #		value comparison fulfilled: ":transient:" attr_value "reviewer_status" "CONTAINS NOT" value "not_approved"
 
 	then
-		reset "plannedenddate" to persistent value
-		reset "stateTime" to persistent value
-		set "plannedenddate" readonly
+		set "plannedenddate" editable
 
 end
 
@@ -871,6 +874,7 @@ rule "custom_GRC66_is reviewer has to decide to a legal issue reviewer state [V]
 	when
 		is in workflow state "openForReview"
 		user is assigned in list "reviewers"
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "issue"
 		value comparison fulfilled: ":transient:" attr_value "custom_is_reviewer_status" "CONTAINS" value "in_progress"
 #		value comparison fulfilled: ":transient:" attr_value "reviewer_status" "CONTAINS" value "to_be_approved"
 		object is dirty
@@ -889,6 +893,7 @@ rule "custom_GRC66_ap reviewer has to decide to a legal issue reviewer state [V]
 	when
 		is in workflow state "apOpenForReview"
 		user is assigned in list "reviewers"
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "actionplan"
 		value comparison fulfilled: ":transient:" attr_value "custom_ap_reviewer_status" "CONTAINS" value "in_progress"
 #		value comparison fulfilled: ":transient:" attr_value "reviewer_status" "CONTAINS" value "to_be_approved"
 		object is dirty

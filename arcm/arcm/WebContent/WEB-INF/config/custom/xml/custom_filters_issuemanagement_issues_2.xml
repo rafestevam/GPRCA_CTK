@@ -84,7 +84,9 @@
         	<filterElement dataReference.idref="business_unit"/>
         </filterRow>
         
-        
+        <filterRow id="cst_appsystem" propertyKey="filter.row.issue.cst_appsystem.DBI">
+        	<filterElement dataReference.idref="cst_appsystem"/>
+        </filterRow>
                 
     </filter>
 </custom>    

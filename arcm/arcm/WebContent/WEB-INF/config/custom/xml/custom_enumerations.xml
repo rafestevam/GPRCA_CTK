@@ -147,7 +147,7 @@
     </enum>
     
     <enum id="cenum_ap_creator_status" isMultiple="false" type="Number">
-        <enumitem id="stepby" value="-3" virtualScope.idrefs="please_select" formRelevant="false" filterRelevant="false"/>
+        <enumitem id="iniciated" value="-3" virtualScope.idrefs="new" formRelevant="false" filterRelevant="false"/>
     	<enumitem id="to_be_evaluated" value="-2" virtualScope.idrefs="in_progress" filterRelevant="false"/>
     	<enumitem id="all" 	value="-1" extendedMeaning="all" />
     	<enumitem id="please_select" value="0" extendedMeaning="please_select" formRelevant="false" filterRelevant="false"/>
@@ -164,7 +164,7 @@
     
     <enum id="cenum_ap_owner_status" isMultiple="false" type="Number">
     	<!-- Status de Workflow -->
-    	<enumitem id="stepby" value="-3" virtualScope.idrefs="please_select" formRelevant="false" filterRelevant="false"/>
+<!--     	<enumitem id="stepby" value="-3" virtualScope.idrefs="please_select" formRelevant="false" filterRelevant="false"/> -->
     	<enumitem id="open" value="-2" virtualScope.idrefs="in_progress" filterRelevant="false"/>
     	<!-- / Status de Workflow -->
     	<enumitem id="all" 	value="-1" extendedMeaning="all" />
@@ -180,8 +180,9 @@
     
     <enum id="cenum_ap_reviewer_status" isMultiple="false" type="Number">
 		<!-- Status de Workflow -->
-		<enumitem id="stepby" value="-3" virtualScope.idrefs="please_select" formRelevant="false" filterRelevant="false"/>
-    	<enumitem id="open" value="-2" virtualScope.idrefs="fup,in_progress,not_approved, please_select" filterRelevant="false"/>
+<!-- 		<enumitem id="stepby" value="-4" virtualScope.idrefs="please_select" formRelevant="false" filterRelevant="false"/> -->
+		<enumitem id="rejected" value="-3" virtualScope.idrefs="not_approved, please_select" formRelevant="false" filterRelevant="false"/>
+    	<enumitem id="open" value="-2" virtualScope.idrefs="fup,in_progress, please_select" filterRelevant="false"/>
     	<!-- / Status de Workflow -->
     	<enumitem id="all" 	value="-1" extendedMeaning="all" />
     	<enumitem id="please_select" value="0" extendedMeaning="please_select" formRelevant="false" filterRelevant="false"/>
@@ -414,6 +415,19 @@
             <parameter name="ClassName" value="com.idsscheer.webapps.arcm.bl.framework.jobs.specific.IssueSLAUpdateJob"/>
         </enumitem>
         <!-- GRC 82 -->
+        
+        <!-- GAU25 -->
+        <enumitem id="IssueAgingReplanJob" value="50">
+            <parameter name="ClassName" value="com.idsscheer.webapps.arcm.bl.framework.jobs.specific.IssueAgingReplanJob"/>
+        </enumitem>
+        <!-- GAU25 -->
+        
+        <!-- GRC14 -->
+        <enumitem id="RADelayMailJob" value="51">
+        	<parameter name="ClassName" value="com.idsscheer.webapps.arcm.bl.framework.jobs.specific.RADelayMailJob"/>
+        </enumitem>
+        <!-- /GRC14 -->
+        
     </enum>
     
 </custom>

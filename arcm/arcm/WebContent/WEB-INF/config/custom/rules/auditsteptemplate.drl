@@ -57,6 +57,10 @@ rule "define mandatory [I,V]"
 
     then
         set "name" mandatory
+#       set "area" mandatory
+#       set "process" mandatory
+#       set "subprocess" mandatory
+#       set "control" mandatory
 
 end
 
@@ -90,6 +94,11 @@ rule "define mandatory if audit template is released [I,V]"
         set "plannedenddate" mandatory
         set "processingtime" mandatory
         set "owner_group" mandatory
+        set "area" mandatory
+        set "process" mandatory
+        set "subprocess" mandatory
+        set "control" mandatory
+
 
 end
 

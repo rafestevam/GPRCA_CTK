@@ -286,9 +286,9 @@ rule "risk assessment not in test period -> define all standard attributes reado
 #		set "impacttypes"           readonly
 #	    set "currency"              readonly
 
-#		set "plannedenddate"        not_mandatory
+		set "plannedenddate"        not_mandatory
 #		set "owner_status"          not_mandatory
-#		set "remark"                not_mandatory
+		set "remark"                not_mandatory
 
 #		add object "error" message "message.risk.assessment.period.not.active.ERR"
 

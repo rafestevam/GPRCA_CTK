@@ -331,6 +331,8 @@ rule "GRC98_set_ra_result_visible[I,V]"
 	when
 	
 	then
-		set "ra_result" visible
+		set "ra_result"             visible
+		set "assessment_activities" not_mandatory
+		set "startdate"             not_mandatory
 		
 end

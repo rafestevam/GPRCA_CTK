@@ -44,6 +44,7 @@
 
 	   	<extendedFilterRow>
             <extendedFilter filterRow.idref="rsk_name"/>
+            <extendedFilter filterRow.idref="cst_appsystem"/>
        	</extendedFilterRow>
 
 	   	<extendedFilterRow>
@@ -62,8 +63,9 @@
             <listHeader column="LC_Issues_3" propertyKey="tableheader.issue.name.DBI" width="5%"/>
             <listHeader column="LC_Issues_13" propertyKey="tableheader.issue.recurrent.DBI" width="3%"/>
             <listHeader column="LC_Issues_14" propertyKey="tableheader.issue.process_environment.DBI" width="3%"/>
-            <listHeader column="LC_Issues_15" propertyKey="tableheader.issue.business_unit.DBI" width="3%"/>
-            <listHeader column="LC_Issues_16" propertyKey="tableheader.issue.root_cause.DBI" width="10%"/>
+            <listHeader column="LC_Issues_15" propertyKey="tableheader.issue.business_unit.DBI" width="2%"/>
+            <listHeader column="LC_Issues_29" propertyKey="tableheader.issue.cst_appsystem.DBI" width="2%"/>
+            <listHeader column="LC_Issues_16" propertyKey="tableheader.issue.root_cause.DBI" width="9%"/>
             <listHeader column="LC_Issues_4" propertyKey="tableheader.issue.priority.DBI" width="3%"/>
             <listHeader column="LC_Issues_5" propertyKey="tableheader.issue.creator.DBI" width="3%"/>
             <listHeader column="LC_Issues_6" propertyKey="tableheader.issue.remedationPlannedBefore.short.DBI" tooltip="tableheader.issue.remedationPlannedBefore.DBI" width="3%"/>
@@ -99,6 +101,7 @@
         <parameter name="deactivatedColumn" value="process_environment"/>
         </column>
         <column id="LC_Issues_15" dataReference.idref="business_unit"/>
+        <column id="LC_Issues_29" dataReference.idref="cst_appsystem"/>
         <column id="LC_Issues_16" dataReference.idref="root_cause"/> 
         <column id="LC_Issues_4" align="center" dataReference.idref="priority">
             <parameter name="showText" value="false"/>

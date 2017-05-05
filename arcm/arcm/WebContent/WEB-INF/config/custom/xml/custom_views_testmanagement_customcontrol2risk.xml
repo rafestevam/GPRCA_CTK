@@ -14,12 +14,12 @@
             <viewColumn id="control_version_number" attributeType="version_number" isSelectColumn="true"/>
             <viewColumn id="control_id" attributeType="control_id" isSelectColumn="true"/>
         </viewObject>
-<!--         <link linktype.id="3251" firstViewObject="VO_risk2control_risk" secondViewObject="VO_risk2control_control"/> --><!-- GAP - GRC14 -->
-        <link linktype.id="4" firstViewObject="VO_risk2control_risk" secondViewObject="VO_risk2control_control"/>
+<!--         <link linktype.id="3251" firstViewObject="VO_risk2control_risk" secondViewObject="VO_risk2control_control"/> -->
+        <link linktype.id="4" firstViewObject="VO_risk2control_control" secondViewObject="VO_risk2control_risk"/>
         <conditions>
             <compoundCondition conditionConnect="AND">
                 <condition column.id="risk_version_active" compareType="EQ" value="true"/>
-<!--                 <condition column.id="control_id" compareType="EQ" /> --><!-- GAP - GRC14 -->
+                <condition column.id="control_id" compareType="EQ" />
                 <condition column.id="control_id" compareType="EQ" currentObjectType.id="CONTROL" currentAttributeType.id="control_id"/>
             </compoundCondition>
         </conditions>

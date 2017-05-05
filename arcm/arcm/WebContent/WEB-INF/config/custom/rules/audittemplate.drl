@@ -61,6 +61,10 @@ rule "audit manager - define mandatory fields [I,V]"
 
     then
         set "name" mandatory
+#       set "risk" mandatory
+#		set "methodology" mandatory
+#       set "regulation" mandatory
+#       set "process" mandatory
 
 end
 
@@ -83,7 +87,10 @@ rule "audit manager - define mandatory fields if audit template is released [I,V
         set "controlstartdate" mandatory
         set "owner_group" mandatory
         set "reviewer_group" mandatory
-
+#		set "risk" mandatory
+#		set "methodology" mandatory
+#       set "regulation" mandatory
+#       set "process" mandatory
 end
 
 rule "audit manager - define editable fields [I,V]"

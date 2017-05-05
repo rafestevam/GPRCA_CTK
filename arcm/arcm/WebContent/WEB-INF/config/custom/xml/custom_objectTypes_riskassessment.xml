@@ -64,7 +64,8 @@
         <!-- Inicio GAP GRC39 -->
         <stringAttrType id="result_assessment" maxCharCount="30" isMassEditable="false" defaultValue="Não Avaliado"/>
         <doubleAttrType id="height" />
-        <stringAttrType id="progress" maxCharCount="100" isMassEditable="false"/>
+<!--         <stringAttrType id="progress" maxCharCount="100" isMassEditable="false"/> -->
+		<enumAttrType id="progress" enumeration="custom_progress" defaultValue="1" />
         <stringAttrType id="risk_id" maxCharCount="100" isMassEditable="false"/>
         <!-- Fim GAP GRC39 -->
         

@@ -1,22 +1,24 @@
 package com.idsscheer.webapps.arcm.ui.components.issuemanagement.actioncommands;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import com.idsscheer.webapps.arcm.bl.datatransport.xml.xmlimport.parsing.validation.IHierarchicalImportObject;
+import com.idsscheer.webapps.arcm.bl.dataaccess.query.IViewQuery;
+import com.idsscheer.webapps.arcm.bl.dataaccess.query.QueryFactory;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObjFacade;
-import com.idsscheer.webapps.arcm.bl.models.objectmodel.IHierarchyAppObj;
+import com.idsscheer.webapps.arcm.bl.models.objectmodel.IViewObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IEnumAttribute;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IListAttribute;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IHierarchyAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeTypeCustom;
-import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITestcaseAttributeType;
-import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITestdefinitionAttributeType;
 import com.idsscheer.webapps.arcm.common.notification.NotificationTypeEnum;
 import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
@@ -25,9 +27,21 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 
 	private static final com.idsscheer.batchserver.logging.Logger debuglog = new com.idsscheer.batchserver.logging.Logger();	
 	private static final boolean DEBUGGER_ON = true;
+	private String viewName = "custom_risk2hierarchies";
+	private String filterColumn = "r_id";
+	private String filterColumn1 = "h_type";
+	private String column_r_id = "r_id";
+	private String column_r_client = "r_client";
+	private String column_h_Name = "h_name";
+	private String column_h_type = "h_type";
+	private String column_h_type_name = "h_type_name";
+
 	protected void afterExecute(){
 		
 		IAppObj issueAppObj = this.formModel.getAppObj();
+		
+		
+		Map filterMap = new HashMap();
 		
 		//IListAttribute iroList = issueAppObj.getAttribute(IIssueAttributeType.LIST_ISSUERELEVANTOBJECTS);
 		IListAttribute iroList = issueAppObj.getAttribute(IIssueAttributeType.LIST_ISSUERELEVANTOBJECTS);
@@ -49,21 +63,19 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 					
 					IAppObj iroAppObj = iroIterator.next();
 					IOVID iroOVID = iroAppObj.getVersionData().getHeadOVID();
-					IAppObj iroLstObj = testFacade.load(iroOVID, true);
+					IAppObj iroLstObj = testFacade.load(iroOVID, true);					
+									
 					
-										
-					
-					if(iroAppObj.getObjectType() != ObjectType.TESTCASE)
+					if(!iroAppObj.getObjectType().equals(ObjectType.TESTCASE))
 						continue;
 					
 					
 					testFacade.allocateWriteLock(iroLstObj.getVersionData().getHeadOVID());								
-					
-					
+									
 					List<IAppObj> LstprocObj = iroLstObj.getAttribute(ITestcaseAttributeType.LIST_PROCESS).getElements(this.getUserContext());				
-					
+										
 					for(IAppObj pcObj : LstprocObj ){
-						
+					
 						String sprocess = pcObj.getAttribute(IHierarchyAttributeType.ATTR_NAME ).getRawValue();
 						this.displayLog("SubProcesso : " + pcObj.getAttribute(IHierarchyAttributeType.ATTR_NAME ).getRawValue());
 						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PROCESS).setRawValue(sprocess);
@@ -95,6 +107,15 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 						this.displayLog("Classificação Risco Residual Associado: " + srskname );
 						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_RSK_NAME).setRawValue(srskname);
 						
+						
+						filterMap.put(this.filterColumn, rskObj.getObjectId());
+						filterMap.put(this.filterColumn1, 11);
+						List<CustomRiskObj> listObj = this.getRiskFromIRO(this.viewName, filterMap);					
+														
+							CustomRiskObj cstRisk = listObj.listIterator().next();					
+							String h_Name = cstRisk.geth_Name();
+							this.displayLog(h_Name);
+							issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_APPSYSTEM).setRawValue(h_Name);
 						break;
 
                   }
@@ -121,7 +142,7 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 						IAppObj iroLstObj = testFacade.load(iroOVID, true);
 						
 						
-						if(iroAppObj.getObjectType() != ObjectType.ISSUE)
+						if(!iroAppObj.getObjectType().equals(ObjectType.ISSUE))
 							continue;
 						
 						String sresult = iroAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
@@ -144,15 +165,9 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 						String srskname = iroAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_RSK_NAME).getRawValue();
 						this.displayLog("risco name:" + srskname);
 						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_RSK_NAME).setRawValue(srskname);
-
-						/*
-						IEnumAttribute isTypeList = iroAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_ISSUESOURCE);
-						IEnumerationItem isType = ARCMCollections.extractSingleEntry(isTypeList.getRawValue(), true);
 						
-						IEnumerationItem sorigemteste = iroAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_ISSUESOURCE).getRawValue();
-						
-						this.displayLog("Origem:" + isType.getId());*/
-						
+						String sappsystem = iroAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_APPSYSTEM).getRawValue();
+						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_APPSYSTEM).setRawValue(sappsystem);
 						
 						break;
 							
@@ -171,6 +186,42 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 			
 		}
 
+private List<CustomRiskObj> getRiskFromIRO(String viewName, Map<String,Object> filterMap){
+		
+		List<CustomRiskObj> retList = new ArrayList<CustomRiskObj>();
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), viewName, filterMap, null,
+				true, this.getDefaultTransaction());
+		try{
+			
+			List<CustomRiskObj> listObj = new ArrayList<CustomRiskObj>();
+			Iterator itQuery = query.getResultIterator();
+			 
+			while(itQuery.hasNext()){
+				
+				CustomRiskObj cstRiskObj = new CustomRiskObj();
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				Long r_Id = (Long) viewObj.getRawValue(this.column_r_id);
+				String h_Name = (String) viewObj.getRawValue(this.column_h_Name);
+				
+				
+				cstRiskObj.seth_Name(h_Name);
+				cstRiskObj.setr_Id(r_Id);
+				
+				listObj.add(cstRiskObj);			
+				
+			}
+			
+			retList.add(listObj.get(listObj.size() - 1));
+						
+		}finally{
+			query.release();
+		}
+		
+		return (List<CustomRiskObj>)retList;
+		
+	}
+	
 	private void displayLog(String message){
 		if(DEBUGGER_ON){
 			debuglog.info(this.getClass().getName(),message );

@@ -68,4 +68,8 @@ public interface IIssueAttributeTypeCustom extends IIssueAttributeType {
 	/*public static final String STR_ENDDATEISSUE="enddateissue";
 	public static final IDateAttributeType ATTR_ENDDATEISSUE=(IDateAttributeType)MetadataConstantsUtil.create(OBJECT_TYPE, STR_ENDDATEISSUE);*/
 	
+	//02/05/2017 INICIO
+	public static final String STR_CST_APPSYSTEM="cst_appsystem";	
+	public static final IStringAttributeType  ATTR_CST_APPSYSTEM= (IStringAttributeType)MetadataConstantsUtil.create(OBJECT_TYPE, STR_CST_APPSYSTEM);
+	//02/05/2017 FIM
 }

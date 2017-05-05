@@ -10,6 +10,7 @@
             <viewColumn id="recurrent" attributeType="recurrent" isSelectColumn="true" isSortable="true"/>
             <viewColumn id="process_environment" attributeType="process_environment" isSelectColumn="true" isSortable="true"/>
             <viewColumn id="business_unit" attributeType="business_unit" isSelectColumn="true" isSortable="true"/>
+            <viewColumn id="cst_appsystem" attributeType="cst_appsystem" isSelectColumn="true" isSortable="true"/>
             <viewColumn id="root_cause" attributeType="root_cause" isSelectColumn="true" isSortable="true"/>           
             <viewColumn id="plannedenddate" attributeType="plannedenddate" isSelectColumn="true" isSortable="true"/>
             <viewColumn id="plannedenddate2" attributeType="plannedenddate" isSortable="true"/>
@@ -96,6 +97,7 @@
                 <condition column.id="cst_process" compareType="LIKE"/>
                 <condition column.id="process_environment" compareType="IN"/>
                 <condition column.id="business_unit" compareType="IN"/>
+				<condition column.id="cst_appsystem" compareType="LIKE"/>
 				
 				<!-- <condition column.id="testcaseobj_id" compareType="EQ" currentObjectType.id="TESTCASE" currentAttributeType.id="obj_id"/> -->
 			    			    

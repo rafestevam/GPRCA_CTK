@@ -56,28 +56,31 @@
             </listRestriction>
         </listAttrType>
     <!-- Customizations of GAU01 -->
-    <listAttrType id="risk" maxSize="1" objectType.idref="RISK" linkType="21009">
+    <listAttrType id="risk" objectType.idref="RISK" linkType="21009">
             <!-- Add List Restrictions -->
         </listAttrType>
-				<listAttrType id="methodology" maxSize="1" objectType.idref="HIERARCHY" linkType="21010">
-            <!-- Add List Restrictions -->
-            <listRestriction>
-                <attributeRestriction attribute="type" value="financialaccount"/>
-            </listRestriction>
-        </listAttrType>
-        <listAttrType id="regulation" maxSize="1" objectType.idref="HIERARCHY" linkType="21011">
+				<listAttrType id="methodology" objectType.idref="HIERARCHY" linkType="21010">
             <!-- Add List Restrictions -->
             <listRestriction>
                 <attributeRestriction attribute="type" value="financialaccount"/>
             </listRestriction>
         </listAttrType>
-        <listAttrType id="process" maxSize="1" objectType.idref="HIERARCHY" linkType="21012">
+        <listAttrType id="regulation" objectType.idref="HIERARCHY" linkType="21011">
+            <!-- Add List Restrictions -->
+            <listRestriction>
+                <attributeRestriction attribute="type" value="financialaccount"/>
+            </listRestriction>
+        </listAttrType>
+        <listAttrType id="process" objectType.idref="HIERARCHY" linkType="21012">
             <!-- Add List Restrictions -->
             <listRestriction>
                 <attributeRestriction attribute="type" value="process"/>
             </listRestriction>
         </listAttrType>
 				<!-- End of Customizations of GAU01 -->
+				
+				<longAttrType id="percentage_completed" defaultValue="0" precision="3:0"/>
+				<longAttrType id="percentage_total" defaultValue="100" precision="3:0"/>
 
         <!-- Doc-Name: Audit start date-->
         <dateAttrType id="auditstartdate">

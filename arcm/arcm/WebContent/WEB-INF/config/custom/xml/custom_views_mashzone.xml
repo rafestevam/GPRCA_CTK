@@ -526,7 +526,7 @@
             
             <!-- Customizing for Mashzone -->
             
-<!--             <viewColumn id="r_origemteste" attributeType="origemteste" mashzoneRelevant="false" isSelectColumn="true"/> -->
+            <viewColumn id="tc_predecessor_otoid" attributeType="predecessor" mashzoneRelevant="true" isSelectColumn="true"/>
             
             <!-- Customizing for Mashzone -->
         </viewObject>
@@ -585,6 +585,90 @@
             </compoundCondition>
         </conditions>
     </view>
+
+<view id="testcasedata2" view.parameter="DISTINCT" relevantForMashzoneIntegration="true">
+        <viewObject id="VO_testcasedata_testcase" objectType="TESTCASE" isMainViewObject="true">
+            <viewColumn id="tc_client" attributeType="client_sign" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_type" attributeType="type" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_start" attributeType="plannedstartdate" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_end" attributeType="plannedenddate" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_testdate" attributeType="execution_date" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_ctrl_start" attributeType="controlstartdate" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_ctrl_end" attributeType="controlenddate" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_owner_status" attributeType="owner_status" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_reviewer_status" attributeType="reviewer_status" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_measure" attributeType="measure" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_ctrl_frq" attributeType="control_frequency" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_test_type" attributeType="testtype"/>
+            <viewColumn id="tc_effect" attributeType="effectiveness"/>
+            <viewColumn id="tc_nature" attributeType="test_nature"/>
+            <viewColumn id="testcase_version_active" attributeType="version_active" mashzoneRelevant="false"/>
+            <viewColumn id="deactivated" attributeType="deactivated" mashzoneRelevant="false"/>
+            
+            <!-- Customizing for Mashzone -->
+            <viewColumn id="testcase_version_number" attributeType="version_number" mashzoneRelevant="true" isSelectColumn="true"/>            
+		    <viewColumn id="testcase_change_date" attributeType="change_date" mashzoneRelevant="true" isSelectColumn="true"/> 
+			<viewColumn id="tc_predecessor_otoid" attributeType="predecessor" mashzoneRelevant="true" isSelectColumn="true"/>
+            
+            <!-- Customizing for Mashzone -->
+        </viewObject>
+        <viewObject id="VO_testcasedata_tester" objectType="USERGROUP">
+            <viewColumn id="tc_tester_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_tester" attributeType="name" isSortable="true" isSelectColumn="true"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_reviewer" objectType="USERGROUP">
+            <viewColumn id="tc_rev_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="tc_rev" attributeType="name" isSortable="true" isSelectColumn="true"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_testuser" objectType="USER">
+            <viewColumn id="tc_perf_by" attributeType="name" isSortable="true" isSelectColumn="true"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_risk" objectType="RISK">
+            <viewColumn id="tc_risk" attributeType="name"/>
+            <viewColumn id="tc_risk_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="r_assert" attributeType="assertions"/>
+            <viewColumn id="r_type" attributeType="risktype"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_control" objectType="CONTROL">
+            <viewColumn id="tc_ctrl" attributeType="name"/>
+            <viewColumn id="tc_ctrl_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="c_coso" attributeType="control_type"/>
+            <viewColumn id="c_exec" attributeType="control_execution"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_testdef" objectType="TESTDEFINITION">
+            <viewColumn id="tc_testdef" attributeType="name" isSortable="true" isSelectColumn="true"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_testerhierarchy" objectType="HIERARCHY">
+            <viewColumn id="tc_th" attributeType="name"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_orgunit" objectType="HIERARCHY">
+            <viewColumn id="tc_org" attributeType="name"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_finacc" objectType="HIERARCHY">
+            <viewColumn id="tc_fsi" attributeType="name"/>
+        </viewObject>
+        <viewObject id="VO_testcasedata_process" objectType="HIERARCHY">
+            <viewColumn id="tc_func" attributeType="name"/>
+        </viewObject>
+        <link linktype.id="57" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_tester" joinType="LEFT"/>
+        <link linktype.id="58" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_reviewer" joinType="LEFT"/>
+        <link linktype.id="12" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_testuser" joinType="LEFT"/>
+        <link linktype.id="19" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_risk" joinType="LEFT"/>
+        <link linktype.id="16" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_control" joinType="LEFT"/>
+        <link linktype.id="14" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_testdef" joinType="LEFT"/>
+        <link linktype.id="72" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_testerhierarchy" joinType="LEFT"/>
+        <link linktype.id="74" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_orgunit" joinType="LEFT"/>
+        <link linktype.id="75" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_finacc" joinType="LEFT"/>
+        <link linktype.id="54" firstViewObject="VO_testcasedata_testcase" secondViewObject="VO_testcasedata_process" joinType="LEFT"/>
+        <conditions>
+            <compoundCondition conditionConnect="AND">
+                <condition column.id="testcase_version_active" compareType="EQ" value="true"/>
+                <condition column.id="deactivated" compareType="EQ" value="false"/>
+            </compoundCondition>
+        </conditions>
+    </view>
+
 
     <view id="testcase2nature" view.parameter="DISTINCT" relevantForMashzoneIntegration="true">
         <viewObject id="VO_testcase2nature_testcase" objectType="TESTCASE" isMainViewObject="true">
@@ -809,6 +893,7 @@
         <viewObject id="VO_radata_assessment" objectType="RISKASSESSMENT" isMainViewObject="true">
             <viewColumn id="ra_client" attributeType="client_sign" isSortable="true" isSelectColumn="true"/>
             <viewColumn id="ra_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>
+            <viewColumn id="ra_version" attributeType="version_number" isSortable="true" isSelectColumn="true" /><!-- GAP GRC14 -->
             <viewColumn id="ra_start" attributeType="plannedstartdate" isSortable="true" isSelectColumn="true"/>
             <viewColumn id="ra_end" attributeType="plannedenddate" isSortable="true" isSelectColumn="true"/>
             <viewColumn id="ra_date" attributeType="execution_date" isSortable="true" isSelectColumn="true"/>
@@ -2396,7 +2481,7 @@
             <!-- Customizing for Mashzone -->
         </viewObject>
         <viewObject id="VO_cet_control" objectType="CONTROL">
-            <viewColumn id="control_objId" attributeType="obj_id"/>
+            <viewColumn id="control_objId" attributeType="obj_id" isSelectColumn="true"/>
             <viewColumn id="control_name" attributeType="name" isSelectColumn="true"/>
         </viewObject>
         <viewObject id="VO_cet_task" objectType="CONTROLEXECUTIONTASK">

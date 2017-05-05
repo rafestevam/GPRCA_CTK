@@ -36,6 +36,7 @@
 	 	 <stringAttrType id="ra_residualfinal"  maxCharCount="50" isMassEditable="false"/>
 	 	 <stringAttrType id="cst_modelname" maxCharCount="800" isMassEditable="false"/>
          <stringAttrType id="cst_process" maxCharCount="800" isMassEditable="false"/>
+         <stringAttrType id="cst_appsystem" maxCharCount="800" isMassEditable="false"/>
          <!-- GAU25 -->
          <dateAttrType id="cst_plandtini" />
          <longAttrType id="cst_rescheduling" defaultValue="0" />

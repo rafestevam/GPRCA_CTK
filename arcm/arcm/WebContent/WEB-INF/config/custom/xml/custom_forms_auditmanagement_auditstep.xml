@@ -73,10 +73,21 @@
             </rowGroup>
             <rowGroup id="audit_step.2">
               <row id="percentage_completed">
+									<cell separator="{td}">
                     <element attribute.idref="percentage_completed">
-                     <parameter name="size" value="10"/>
+                     <parameter name="size" value="3"/>
                     </element>
+                    	<element attribute.idref="obj_id" template="formCompleteness">
+                        <parameter name="viewName" value="customShowAuditCompleteness"/>
+                        <parameter name="totalProperty" value="percentage_total"/>
+                        <parameter name="progressProperty" value="percentage_completed"/>
+                    </element>
+									</cell>
                 </row>
+                <!--
+                <row id="progressCustom" protocolRelevant="false" propertyKey="form.row.audit.progress.DBI">
+                    
+                </row>-->
                 <row id="obj_id">
                     <element attribute.idref="obj_id"/>
                 </row>

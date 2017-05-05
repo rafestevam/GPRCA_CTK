@@ -2,18 +2,25 @@ package com.idsscheer.webapps.arcm.ui.components.testmanagement.actioncommands;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.idsscheer.webapps.arcm.bl.dataaccess.query.IViewQuery;
+import com.idsscheer.webapps.arcm.bl.dataaccess.query.QueryFactory;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObjFacade;
+import com.idsscheer.webapps.arcm.bl.models.objectmodel.IViewObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IEnumAttribute;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjIterator;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjQuery;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlAttributeTypeCustom;
+import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlexecutionAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITestCaseAttributeTypeCustom;
@@ -21,7 +28,9 @@ import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITestcaseA
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITestdefinitionAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
+import com.idsscheer.webapps.arcm.common.util.ovid.OVIDFactory;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
+import com.idsscheer.webapps.arcm.services.framework.batchserver.services.lockservice.LockType;
 
 public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 	
@@ -38,6 +47,12 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 	private String fernanda = "";
 	private String origemTeste = "";
 	final Logger log = Logger.getLogger(CustomTestcaseSaveActionCommand.class.getName());
+	private double countInef2line = 0;
+	private double countInef3line = 0;
+	private double countTotal2line = 0;
+	private double countTotal3line = 0;
+	private long tdObjectId = 0;
+	private String riskClass1Line = "";
 
 	protected void addForwardDialog() {
 		this.executeCalculation();
@@ -46,35 +61,63 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 	
 	//protected void afterExecute(){
 	private void executeCalculation(){
-		
-		IAppObj currAppObj = this.formModel.getAppObj();
-		IAppObj currParentCtrlObj = this.parentControl(currAppObj);
-		String ownerStatus = this.requestContext.getParameter(ITestcaseAttributeType.STR_OWNER_STATUS);
-		//this.origemTeste = this.requestContext.getParameter(ITestCaseAttributeTypeCustom.STR_ORIGEMTESTE);
-		
-		IEnumAttribute origemTesteAttr = currAppObj.getAttribute(ITestCaseAttributeTypeCustom.ATTR_ORIGEMTESTE);
-		IEnumerationItem origemTeste = ARCMCollections.extractSingleEntry(origemTesteAttr.getRawValue(), true);
-		this.origemTeste = origemTeste.getId();
-		log.info("Origem do Teste: " + this.origemTeste);
-		
-		if(ownerStatus.equals("3"))
-			this.fernanda = "effective";
-		
-		if(ownerStatus.equals("4"))
-			this.fernanda = "noneffective";
-
-		log.info("Status de Proprietário: " + ownerStatus);
-		
-		try{
 			
-			IAppObj riskParentObj = this.getRiskFromControl(currParentCtrlObj);
+		try{
+		
+			IAppObj currAppObj = this.formModel.getAppObj();
+			//IAppObj currParentCtrlObj = this.parentControl(currAppObj);
+			long parentControlObjId = this.parentControl(currAppObj.getObjectId());
+			//String ownerStatus = this.requestContext.getParameter(ITestcaseAttributeType.STR_OWNER_STATUS);
+			//this.origemTeste = this.requestContext.getParameter(ITestCaseAttributeTypeCustom.STR_ORIGEMTESTE);
+			IEnumAttribute ownerStatusAttr = currAppObj.getAttribute(ITestcaseAttributeType.ATTR_OWNER_STATUS);
+			IEnumerationItem ownerStatus = ARCMCollections.extractSingleEntry(ownerStatusAttr.getRawValue(), true);
+			
+			IEnumAttribute origemTesteAttr = currAppObj.getAttribute(ITestCaseAttributeTypeCustom.ATTR_ORIGEMTESTE);
+			IEnumerationItem origemTeste = ARCMCollections.extractSingleEntry(origemTesteAttr.getRawValue(), true);
+			this.origemTeste = origemTeste.getId();
+			log.info("Origem do Teste: " + this.origemTeste);
+			
+			if(this.origemTeste.equals("1linhadefesa"))
+				this.countTotal2line += 1;
+			if(this.origemTeste.equals("2linhadefesa"))
+				this.countTotal3line += 1;
+			
+			if(ownerStatus.getId().equals("effective"))
+				this.fernanda = "effective";
+			
+			if(ownerStatus.getId().equals("noneffective")){
+				this.fernanda = "noneffective";
+				if(this.origemTeste.equals("1linhadefesa"))
+					this.countInef2line += 1;
+				if(this.origemTeste.equals("2linhadefesa"))
+					this.countInef3line += 1;
+			}
+			
+			List<IAppObj> tdList = currAppObj.getAttribute(ITestcaseAttributeType.LIST_TESTDEFINITION).getElements(getUserContext());
+			for(int i = 0; i < tdList.size(); i++){
+				IAppObj tdObj = tdList.get(i);
+				this.tdObjectId = tdObj.getObjectId();
+			}
+				
+			log.info("Status de Proprietário: " + ownerStatus);
+		
+			//IAppObj riskParentObj = this.getRiskFromControl(currParentCtrlObj);
+			IAppObj riskParentObj = this.getRiskFromControl(parentControlObjId);
 			if(riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).isEmpty()){
 				this.riscoPotencial = "Nao Avaliado";
 			}else{
 				this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
 			}
+			
+			if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL1LINE).isEmpty())
+				this.riskClass1Line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL1LINE).getRawValue();
+			
 			log.info("Risco Pai: " + riskParentObj.getAttribute(IRiskAttributeType.ATTR_RISK_ID).getRawValue());
-			this.affectResidualRisk(riskParentObj);
+			//if(ownerStatus.equals("3") || ownerStatus.equals("4"))
+			if(this.requestContext.getParameter(ITestcaseAttributeType.STR_REVIEWER_STATUS).equals("1")){
+				this.controlClassification(currAppObj.getAttribute(ITestcaseAttributeType.LIST_CONTROL).getElements(getUserContext()));
+				this.affectResidualRisk(riskParentObj);
+			}
 			
 			
 		}catch(Exception e){
@@ -96,6 +139,37 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		}
 		
 		return parentControlObj;
+		
+	}
+	
+	private long parentControl(long ceObjId) throws Exception{
+		
+		Map filterMap = new HashMap();
+		filterMap.put("tc_id", ceObjId);
+		long controlID = 0;
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "custom_TestCase2Control", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				controlID = (Long)viewObj.getRawValue("ct_id");
+				
+			}
+		
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}
+		
+		return controlID;
 		
 	}
 	
@@ -175,6 +249,44 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		
 	}
 	
+	private IAppObj getRiskFromControl(long controlObjID) throws Exception{
+		
+		IAppObj riskAppObj = null;
+		long riskID = 0;
+		long riskVersionNumber = 0;
+		
+		Map filterMap = new HashMap();
+		filterMap.put("control_obj_id", controlObjID);
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "customcontrol2risk", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				riskID = (Long)viewObj.getRawValue("risk_obj_id");
+				riskVersionNumber = (Long)viewObj.getRawValue("risk_version_number");
+				
+			}
+		
+			IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
+			IOVID riskOVID = OVIDFactory.getOVID(riskID, riskVersionNumber);
+			riskAppObj = riskFacade.load(riskOVID, true);
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}
+		
+		return riskAppObj;
+		
+	}
+	
 	private void affectResidualRisk(IAppObj riskObj) throws Exception{
 		
 		double cntTotal2Line = 0;
@@ -189,23 +301,26 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 			IAppObj riskUpdObj = riskFacade.load(riskOVID, true);
 			riskFacade.allocateWriteLock(riskOVID);
 			
-			IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
+			//IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
 		
 			List<IAppObj> controlList = riskObj.getAttribute(IRiskAttributeType.LIST_CONTROLS).getElements(this.getFullGrantUserContext());
 			for(IAppObj controlObj : controlList){
 				
-				IOVID controlOVID = controlObj.getVersionData().getHeadOVID();
+				/*IOVID controlOVID = controlObj.getVersionData().getHeadOVID();
 				IAppObj controlUpdObj = controlFacade.load(controlOVID, true);
-				controlFacade.allocateWriteLock(controlOVID);
+				controlFacade.allocateWriteLock(controlOVID);*/
 				
 				List<IAppObj> tstDefList = controlObj.getAttribute(IControlAttributeType.LIST_TESTDEFINITIONS).getElements(this.getFullGrantUserContext());
 				for(IAppObj tstDefObj : tstDefList){
 					
-					if(this.testDefClass(tstDefObj).equals("1linhadefesa"))
+					if(tstDefObj.getObjectId() == this.tdObjectId)
+						continue;
+					
+					/*if(this.testDefClass(tstDefObj).equals("1linhadefesa"))
 						cntTotal2Line += 1;
 					
 					if(this.testDefClass(tstDefObj).equals("2linhadefesa"))
-						cntTotal3Line += 1;
+						cntTotal3Line += 1;*/
 					
 					log.info("Total Testes 2a Linha: " + String.valueOf(cntTotal2Line));
 					log.info("Total Testes 3a Linha: " + String.valueOf(cntTotal3Line));
@@ -215,22 +330,31 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 						
 						IEnumAttribute ownerStatusAttr = tstCaseObj.getAttribute(ITestcaseAttributeType.ATTR_OWNER_STATUS);
 						IEnumerationItem ownerStatusItem = ARCMCollections.extractSingleEntry(ownerStatusAttr.getRawValue(), true);
+						IEnumAttribute reviewerStatusAttr = tstCaseObj.getAttribute(ITestcaseAttributeType.ATTR_REVIEWER_STATUS);
+						IEnumerationItem reviewerStatusItem = ARCMCollections.extractSingleEntry(reviewerStatusAttr.getRawValue(), true);
 						log.info("Caso de Teste: " + tstCaseObj.getAttribute(ITestcaseAttributeType.ATTR_NAME).getRawValue());
 						log.info("Efetividade do Teste: " + ownerStatusItem.getId());
-						if(ownerStatusItem.getId().equals("noneffective")){
-							if(this.testDefClass(tstDefObj).equals("1linhadefesa")){
-								cntInef2Line += 1;
-								log.info("TC ineficaz 2 linha: " + String.valueOf(cntInef2Line));
+						if(reviewerStatusItem.getId().equals("accepted")){
+							if(this.testDefClass(tstDefObj).equals("1linhadefesa"))
+								cntTotal2Line += 1;
+							if(this.testDefClass(tstDefObj).equals("2linhadefesa"))
+								cntTotal3Line += 1;
+								
+							if(ownerStatusItem.getId().equals("noneffective")){
+								if(this.testDefClass(tstDefObj).equals("1linhadefesa")){
+									cntInef2Line += 1;
+									log.info("TC ineficaz 2 linha: " + String.valueOf(cntInef2Line));
+								}
+								if(this.testDefClass(tstDefObj).equals("2linhadefesa")){
+									cntInef3Line += 1;
+									log.info("TC ineficaz 3 linha: " + String.valueOf(cntInef3Line));
+								}
+								//controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("ineficaz");
+							}else{
+								//controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("eficaz");
 							}
-							if(this.testDefClass(tstDefObj).equals("2linhadefesa")){
-								cntInef3Line += 1;
-								log.info("TC ineficaz 3 linha: " + String.valueOf(cntInef3Line));
-							}
-							//controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("ineficaz");
-						}else{
-							//controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("eficaz");
 						}
-						if(ownerStatusItem.getId().equals("new")){
+						/*if(ownerStatusItem.getId().equals("new")){
 							if(this.fernanda.equals("noneffective")){
 								if(this.testDefClass(tstDefObj).equals("1linhadefesa")){
 									cntInef2Line += 1;
@@ -244,7 +368,7 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 							}else{
 								controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("eficaz");
 							}
-						}
+						}*/
 					}
 					
 				}
@@ -253,23 +377,35 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 			
 			String riskClassFinal = "";
 			
+			cntInef2Line = cntInef2Line + this.countInef2line;
+			cntInef3Line = cntInef3Line + this.countInef3line;
+			
+			cntTotal2Line = cntTotal2Line + this.countTotal2line;
+			cntTotal3Line = cntTotal3Line + this.countTotal3line;
+			
 			if(cntTotal2Line == 0)
 				cntInef2Line = 0;
 			
 			if(cntTotal3Line == 0)
 				cntInef3Line = 0;
 			
+			String riskClass2line = "";
+			String riskClass3line = "";
+			
 			if(this.origemTeste.equals("1linhadefesa")){
 				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_INEF2LINE).setRawValue(cntInef2Line);
 				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_FINAL2LINE).setRawValue(cntTotal2Line);
 				double risk2line = ( cntInef2Line / cntTotal2Line );
 				log.info("Ponderacao 2 linha: " + String.valueOf(risk2line));
-				String riskClass2line = this.riskClassification(risk2line);
+				riskClass2line = this.riskClassification(risk2line);
+				if(!riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).isEmpty()){
+					riskClass3line = riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).getRawValue();
+				}
 				log.info("Classificacao 2 linha: " + riskClass2line);
 				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).setRawValue(riskClass2line);
 				log.info("Classificacao 2 linha - ATTR: " + riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).getRawValue());
-				riskClassFinal = riskClass2line;
-				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).setRawValue(riskClassFinal);
+				//riskClassFinal = riskClass2line;
+				//riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).setRawValue(riskClassFinal);
 				log.info("Classificacao Final - ATTR: " + riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).getRawValue());
 			}
 			
@@ -278,14 +414,40 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_FINAL3LINE).setRawValue(cntTotal3Line);
 				double risk3line = ( cntInef3Line / cntTotal3Line );
 				log.info("Ponderacao 3 linha: " + String.valueOf(risk3line));
-				String riskClass3line = this.riskClassification(risk3line);
+				riskClass3line = this.riskClassification(risk3line);
+				if(!riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).isEmpty()){
+					riskClass2line = riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).getRawValue();
+				}
 				log.info("Classificacao 3 linha: " + riskClass3line);
 				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).setRawValue(riskClass3line);
 				log.info("Classificacao 3 linha - ATTR: " + riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).getRawValue());
-				riskClassFinal = riskClass3line;
-				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).setRawValue(riskClassFinal);
+				//riskClassFinal = riskClass3line;
+				//riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).setRawValue(riskClassFinal);
 				log.info("Classificacao Final - ATTR: " + riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).getRawValue());
 			}
+			
+			if(this.riskClass1Line.equals("")){
+				if((!riskClass2line.equals("")) && (riskClass3line.equals(""))){
+					riskClassFinal = this.riskFinalClassification("", riskClass2line, "");
+				}else{
+					if((riskClass2line.equals("")) && (!riskClass3line.equals(""))){
+						riskClassFinal = this.riskFinalClassification("", "", riskClass3line);
+					}else{
+						riskClassFinal = this.riskFinalClassification("", riskClass2line, riskClass3line);
+					}
+				}
+			}else{
+				if((!riskClass2line.equals("")) && (riskClass3line.equals(""))){
+					riskClassFinal = this.riskFinalClassification(this.riskClass1Line, riskClass2line, "");
+				}else{
+					if((riskClass2line.equals("")) && (!riskClass3line.equals(""))){
+						riskClassFinal = this.riskFinalClassification(this.riskClass1Line, "", riskClass3line);
+					}else{
+						riskClassFinal = this.riskFinalClassification(this.riskClass1Line, riskClass2line, riskClass3line);
+					}
+				}
+			}
+			riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).setRawValue(riskClassFinal);
 			
 			/*String riskClass1line = riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL1LINE).getRawValue();
 			if(riskClass1line == null)
@@ -326,6 +488,41 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		}
 		catch(Exception e){
 			log.info("Risco Exception: " + e.getMessage());
+			throw e;
+		}
+		
+	}
+	
+private void controlClassification(List<IAppObj> controlList) throws Exception{
+		
+		IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
+		IOVID ovid = null;
+		try{
+		
+			Iterator itControl = controlList.iterator();
+			while(itControl.hasNext()){
+				
+				IAppObj controlObj = (IAppObj)itControl.next();
+				IOVID controlOVID = controlObj.getVersionData().getHeadOVID();
+				ovid = controlOVID;
+				IAppObj controlUpdObj = controlFacade.load(controlOVID, true);
+				controlFacade.allocateLock(controlOVID, LockType.FORCEWRITE);
+				
+				if(this.fernanda.equals("ineffective")){
+					controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("ineficaz");
+				}else{
+					controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("eficaz");
+				}
+				
+				controlFacade.save(controlUpdObj, this.getDefaultTransaction(), true);
+				controlFacade.releaseLock(controlOVID);
+				
+				break;
+				
+			}
+		
+		}catch(Exception e){
+			controlFacade.releaseLock(ovid);
 			throw e;
 		}
 		
@@ -408,6 +605,59 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		
 	}
 	
+	private List<IAppObj> getTestCaseFromTestDef(long testDefObjID) throws Exception{
+		
+		List<IAppObj> testCaseReturn = new ArrayList<IAppObj>();
+		List<IAppObj> testCaseBuffer = new ArrayList<IAppObj>();
+		
+		Map filterMap = new HashMap();
+		filterMap.put("tdef_id", testDefObjID);
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "custom_TestDef2TestCase", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				long tcID = (Long)viewObj.getRawValue("tcase_id");
+				long tcVersionNumber = (Long)viewObj.getRawValue("tcase_version_number");
+				
+				IAppObjFacade tcFacade = this.environment.getAppObjFacade(ObjectType.TESTCASE);
+				IOVID tcOVID = OVIDFactory.getOVID(tcID, tcVersionNumber);
+				IAppObj tcAppObj = tcFacade.load(tcOVID, true);
+				
+				if(tcAppObj != null)
+					testCaseBuffer.add(tcAppObj);
+				
+			}
+			
+			if(testCaseBuffer.size() > 0){
+				testCaseBuffer.sort(new Comparator<IAppObj>(){
+					@Override
+					public int compare(IAppObj ant, IAppObj post){
+						long antTime = ant.getVersionData().getCreateDate().getTime();
+						long postTime = post.getVersionData().getCreateDate().getTime();
+						return antTime < postTime ? -1 : antTime == postTime ? 0 : 1;
+					}
+				});
+				testCaseReturn.add(testCaseBuffer.get(testCaseBuffer.size() - 1));
+			}
+		
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}		
+		
+		return (List<IAppObj>) testCaseReturn;
+		
+	}
+	
 	private String riskClassification(double riskVuln){
 		
 		String riskClassif = "";
@@ -440,42 +690,47 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		String riskClassFinal = "";
 		
 		try{
-		
-			//Classificação - Amb. Controles 1a Linha
-			if(risk1line.equalsIgnoreCase("Muito Alto"))
-				height_1line = 4;
-			if(risk1line.equalsIgnoreCase("Alto"))
-				height_1line = 3;
-			if(risk1line.equalsIgnoreCase("Médio"))
-				height_1line = 2;
-			if(risk1line.equalsIgnoreCase("Baixo"))
-				height_1line = 1;
 			
-			log.info("Height 1 Line: " + String.valueOf(height_1line));
+			if(!risk1line.equals("")){
+				//Classificação - Amb. Controles 1a Linha
+				if(risk1line.equalsIgnoreCase("Muito Alto"))
+					height_1line = 4;
+				if(risk1line.equalsIgnoreCase("Alto"))
+					height_1line = 3;
+				if(risk1line.equalsIgnoreCase("Médio"))
+					height_1line = 2;
+				if(risk1line.equalsIgnoreCase("Baixo"))
+					height_1line = 1;
+				log.info("Height 1 Line: " + String.valueOf(height_1line));
+			}
 			
-			//Classificação - Amb. Controles 2a Linha
-			if(risk2line.equalsIgnoreCase("Muito Alto"))
-				height_2line = 4;
-			if(risk2line.equalsIgnoreCase("Alto"))
-				height_2line = 3;
-			if(risk2line.equalsIgnoreCase("Médio"))
-				height_2line = 2;
-			if(risk2line.equalsIgnoreCase("Baixo"))
-				height_2line = 1;
 			
-			log.info("Height 2 Line: " + String.valueOf(height_2line));
 			
-			//Classificação - Amb. Controles 3a Linha
-			if(risk3line.equalsIgnoreCase("Muito Alto"))
-				height_3line = 4;
-			if(risk3line.equalsIgnoreCase("Alto"))
-				height_3line = 3;
-			if(risk3line.equalsIgnoreCase("Médio"))
-				height_3line = 2;
-			if(risk3line.equalsIgnoreCase("Baixo"))
-				height_3line = 1;		
+			if(!risk2line.equals("")){
+				//Classificação - Amb. Controles 2a Linha
+				if(risk2line.equalsIgnoreCase("Muito Alto"))
+					height_2line = 4;
+				if(risk2line.equalsIgnoreCase("Alto"))
+					height_2line = 3;
+				if(risk2line.equalsIgnoreCase("Médio"))
+					height_2line = 2;
+				if(risk2line.equalsIgnoreCase("Baixo"))
+					height_2line = 1;
+				log.info("Height 2 Line: " + String.valueOf(height_2line));
+			}
 			
-			log.info("Height 3 Line: " + String.valueOf(height_3line));
+			if(!risk3line.equals("")){
+				//Classificação - Amb. Controles 3a Linha
+				if(risk3line.equalsIgnoreCase("Muito Alto"))
+					height_3line = 4;
+				if(risk3line.equalsIgnoreCase("Alto"))
+					height_3line = 3;
+				if(risk3line.equalsIgnoreCase("Médio"))
+					height_3line = 2;
+				if(risk3line.equalsIgnoreCase("Baixo"))
+					height_3line = 1;		
+				log.info("Height 3 Line: " + String.valueOf(height_3line));
+			}
 			
 			int maxHeightCtrl = Math.max(height_1line, Math.max(height_2line, height_3line));
 			log.info("Height Max: " + String.valueOf(maxHeightCtrl));
@@ -549,6 +804,18 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 			riskResidualReturn = "Médio";
 		
 		if(riskPotencial.equals("Médio") && riskControlFinal.equals("Baixo"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Muito Alto"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Alto"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Médio"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Baixo"))
 			riskResidualReturn = "Baixo";
 		
 		return riskResidualReturn;

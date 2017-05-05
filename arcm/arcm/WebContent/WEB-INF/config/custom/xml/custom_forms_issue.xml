@@ -61,7 +61,11 @@
                 
                 <row id="cst_process">
                     <element attribute.idref="cst_process"/>
-                </row>                
+                </row>  
+                
+                 <row id="cst_appsystem">
+                    <element attribute.idref="cst_appsystem"/>                        
+                </row>              
                                 
                 <row id="root_cause">
                     <element attribute.idref="root_cause"/>

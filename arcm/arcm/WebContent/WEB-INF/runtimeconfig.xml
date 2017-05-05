@@ -411,7 +411,33 @@
             <parameter name="startScheduler" value="true"/>
             <parameter name="executionTime" value="0 32 00 ? * SUN-SAT"/>
         </parameterList>
-
+        
+        <!-- Inicio GAP - GRC14 -->
+        <parameterList name="RADelayMailJob">
+        	<parameter name="jobitem" value="RADelayMailJob"/>
+        	<parameter name="startScheduler" value="true"/>
+        	<parameter name="executionTime" value="0 44 21 ? * SUN-SAT"/>
+        	<parameter name="clientexcludinglist" value="" />
+        	<parameter name="className" value="RADelayMailJob" />
+        	<parameter name="clientbased" value="false"/>
+        </parameterList>
+        <!-- Fim GAP - GRC14 -->
+        
+        <!-- GAU025-->
+		<parameterList name="IssueAgingReplanJob">
+            <parameter name="jobitem" value="IssueAgingReplanJob" />
+            <parameter name="startScheduler" value="true"/>
+            <parameter name="executionTime" value="0 02 01 ? * SUN-SAT"/>
+            <!-- comma separated client-signs of clients that should be excluded -->
+            <parameter name="clientexcludinglist" value=""/>
+            <!-- please do not edit -->
+            <!-- <parameter name="className" value="JobListCleaningJob/>" -->
+            <parameter name="className" value="IssueAgingReplanJob"/>
+            <!-- please do not edit -->
+            <parameter name="clientbased" value="false"/>
+        </parameterList>
+		<!-- GAU025-->
+        
     </section>
 
     <!-- configuration of logging -->

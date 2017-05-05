@@ -16,8 +16,8 @@ public class CustomRiskLoadCommand extends RiskassessmentCacheActionCommand{
 		super.assumeData(p_excludeParameters);
 		IRiskassessmentFormModel model = (IRiskassessmentFormModel) this.formModel;
 		
-		model.getAppObj().getAttribute(IRiskassessmentAttributeTypeCustom.ATTR_PROGRESS).setRawValue(this.defineTermStatus(model));
-		model.getAppObj().getAttribute(IRiskassessmentAttributeTypeCustom.ATTR_RISK_ID).setRawValue(this.getRiskID(model));
+//		model.getAppObj().getAttribute(IRiskassessmentAttributeTypeCustom.ATTR_PROGRESS).setRawValue(this.defineTermStatus(model));
+//		model.getAppObj().getAttribute(IRiskassessmentAttributeTypeCustom.ATTR_RISK_ID).setRawValue(this.getRiskID(model));
 		
 	}
 	

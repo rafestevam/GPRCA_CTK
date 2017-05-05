@@ -35,7 +35,6 @@
             <viewColumn id="ce_task_name" attributeType="name" isSelectColumn="true"/>
         </viewObject>
         <!-- Inicio GAP - GRC14 -->
-        <!--
         <viewObject id="VO_ce_usergroup" objectType="USERGROUP">
             <viewColumn id="ownergroup_name" attributeType="name" isSortable="true" isSelectColumn="true"/>
             <viewColumn id="ownergroup_version_active" attributeType="version_active"/>
@@ -44,13 +43,12 @@
             <viewColumn id="owner_name" attributeType="name"/>
             <viewColumn id="owner_deactivated" attributeType="deactivated"/>
         </viewObject>
-        -->
         <!-- Fim GAP - GRC14 -->
         <link linktype.id="6055" firstViewObject="VO_ce_task" secondViewObject="VO_ce_obj"/>
         <link linktype.id="6050" firstViewObject="VO_ce_task" secondViewObject="VO_ce_control"/>
         <!-- Inicio GAP - GRC14 -->
-<!--         <link linktype.id="6056" firstViewObject="VO_ce_obj" secondViewObject="VO_ce_usergroup"/> -->
-<!--         <link linktype.id="6057" firstViewObject="VO_ce_obj" secondViewObject="VO_ce_owner" joinType="LEFT"/> -->
+        <link linktype.id="6056" firstViewObject="VO_ce_obj" secondViewObject="VO_ce_usergroup"/>
+        <link linktype.id="6057" firstViewObject="VO_ce_obj" secondViewObject="VO_ce_owner" joinType="LEFT"/>
 		<!-- Fim GAP - GRC14 -->
 		
         <conditions>
@@ -77,14 +75,14 @@
                 <condition column.id="control_name" compareType="LIKE"/>
                 <condition column.id="ce_task_name" compareType="LIKE"/>
                 <!-- Inicio GAP - GRC14 -->
-<!--                 <condition column.id="ownergroup_name" compareType="LIKE"/> -->
-<!--                 <condition column.id="ownergroup_version_active" compareType="EQ" value="true"/> -->
-<!--                 <condition column.id="owner_name" compareType="LIKE"/> -->
+                <condition column.id="ownergroup_name" compareType="LIKE"/>
+                <condition column.id="ownergroup_version_active" compareType="EQ" value="true"/>
+                <condition column.id="owner_name" compareType="LIKE"/>
                 <!-- "owner" might not be set yet -->
-<!--                 <compoundCondition conditionConnect="OR"> -->
-<!--                     <condition column.id="owner_deactivated" compareType="EQ" value="false"/> -->
-<!--                     <condition column.id="owner_deactivated" compareType="ISNULL"/> -->
-<!--                 </compoundCondition> -->
+                <compoundCondition conditionConnect="OR">
+                    <condition column.id="owner_deactivated" compareType="EQ" value="false"/>
+                    <condition column.id="owner_deactivated" compareType="ISNULL"/>
+                </compoundCondition>
 			<!-- Fim GAP - GRC14 -->
             </compoundCondition>
         </conditions>

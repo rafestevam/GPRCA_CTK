@@ -4,13 +4,20 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.Icon;
 
 import org.apache.log4j.Logger;
 
+import com.idsscheer.webapps.arcm.bl.dataaccess.query.IViewQuery;
+import com.idsscheer.webapps.arcm.bl.dataaccess.query.QueryFactory;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObjFacade;
+import com.idsscheer.webapps.arcm.bl.models.objectmodel.IViewObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IEnumAttribute;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjIterator;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjQuery;
@@ -23,7 +30,9 @@ import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttri
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
+import com.idsscheer.webapps.arcm.common.util.ovid.OVIDFactory;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
+import com.idsscheer.webapps.arcm.services.framework.batchserver.services.lockservice.LockType;
 import com.idsscheer.webapps.arcm.ui.framework.actioncommands.object.BaseSaveActionCommand;
 
 public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
@@ -39,23 +48,38 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 	private String control2line = "";
 	private String control3line = "";
 	final Logger log = Logger.getLogger(CustomSaveCEActionCommand.class.getName());
+	private String ceControlExec = "";
+	private double countInef = 0;
+	private long cetObjectId = 0;
 
 	protected void afterExecute(){
 		
-		IAppObj currAppObj = this.formModel.getAppObj();
-		IAppObj currParentCtrlObj = this.parentControl(currAppObj);
-		String ceStatus = this.requestContext.getParameter(IControlexecutionAttributeTypeCustom.STR_CUSTOMCTRLEXECSTATUS);
-		String ceControlExec = this.requestContext.getParameter(IControlexecutionAttributeType.STR_OWNER_STATUS);
-		
-		if(ceStatus.equals("1"))
-			this.currStatus = "effective";
-		
-		if(ceStatus.equals("2"))
-			this.currStatus = "ineffective";
-			
 		try{
+		
+			IAppObj currAppObj = this.formModel.getAppObj();
+			//IAppObj currParentCtrlObj = this.parentControl(currAppObj);
+			long parentControlObjId = this.parentControl(currAppObj.getObjectId());
+			String ceStatus = this.requestContext.getParameter(IControlexecutionAttributeTypeCustom.STR_CUSTOMCTRLEXECSTATUS);
+			this.ceControlExec = this.requestContext.getParameter(IControlexecutionAttributeType.STR_OWNER_STATUS);
+			
+			if(ceStatus.equals("1"))
+				this.currStatus = "effective";
+			
+			if(ceStatus.equals("2")){
+				this.currStatus = "ineffective";
+				this.countInef += 1;
+			}
+			
+			List<IAppObj> cetList = currAppObj.getAttribute(IControlexecutionAttributeType.LIST_CONTROLEXECUTIONTASK).getElements(getUserContext());
+			for(int i = 0; i < cetList.size(); i++){
+				IAppObj cetObj = cetList.get(i);
+				this.cetObjectId = cetObj.getObjectId();
+			}
+			
+		
 			//
-			IAppObj riskParentObj = this.getRiskFromControl(currParentCtrlObj);
+			//IAppObj riskParentObj = this.getRiskFromControl(currParentCtrlObj);
+			IAppObj riskParentObj = this.getRiskFromControl(parentControlObjId);
 			log.info("risk parent obj: " + riskParentObj.toString());
 			this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
 			
@@ -65,8 +89,10 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 			if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).isEmpty())
 				this.control3line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).getRawValue();
 			
-			if(ceControlExec.equals("3"))
+			if(this.ceControlExec.equals("3")){
+				this.controlClassification(currAppObj.getAttribute(IControlexecutionAttributeType.LIST_CONTROL).getElements(getUserContext()));
 				this.affectResidualRisk(riskParentObj);
+			}
 			
 			
 		}catch(Exception e){
@@ -90,96 +116,165 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 		
 	}
 	
-	private IAppObj getRiskFromControl(IAppObj controlObj) throws Exception{
+	private long parentControl(long ceObjId) throws Exception{
 		
-		IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
-		IAppObjQuery riskQuery = riskFacade.createQuery();
-		IAppObjIterator riskIterator = riskQuery.getResultIterator();
-		IAppObj riskAppObj = null;
-		//log.info("infra para obtenção de risco pronta");
+		Map filterMap = new HashMap();
+		filterMap.put("ce_id", ceObjId);
+		long controlID = 0;
 		
-		while(riskIterator.hasNext()){
-			
-			IAppObj riskObj = riskIterator.next();
-			//log.info("risco lido" + riskObj.getAttribute(IRiskAttributeType.ATTR_NAME).getRawValue());
-			
-			if(!(riskAppObj == null))
-				break;
-			
-			List<IAppObj> ctrlList = riskObj.getAttribute(IRiskAttributeType.LIST_CONTROLS).getElements(this.getUserContext());
-			for(IAppObj ctrlObj : ctrlList){
-				if(ctrlObj.getGuid().equals(controlObj.getGuid())){
-					//log.info("risco do controle" + riskObj.getAttribute(IRiskAttributeType.ATTR_NAME).getRawValue());
-					riskAppObj = riskObj;
-					break;
-				}
-			}
-			
-		}
-		riskQuery.release();
-		
-		return riskAppObj;
-		
-		
-		/*Map filterMap = new HashMap();
-		//filterMap.put("control_obj_id", controlObj.getAttribute(IControlAttributeType.ATTR_CONTROL_ID).getRawValue());
-		log.info("RFC filtermap declarado");
-		log.info("RFC Control ID: " + controlObj.getAttribute(IControlAttributeType.ATTR_CONTROL_ID).getRawValue());
-				
-		IAppObj riskReturn = null;
-		IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
-		log.info("RFC risk facade declarado");
-		log.info("RFC " + riskFacade.toString());
-		
-		log.info(this.viewName);
-		IViewQuery query = QueryFactory.createQuery(this.getUserContext(), this.viewName, filterMap, null,
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "custom_CE2Control", filterMap, null,
 				true, this.getDefaultTransaction());
 		
-		log.info(query.getSize());
-		
 		try{
+		
+			Iterator itQuery = query.getResultIterator();
 			
-			log.info("RFC query executada");
-			
-			Iterator it = query.getResultIterator();
-			while(it.hasNext()){
+			while(itQuery.hasNext()){
 				
-				log.info("RFC iterator");
-				
-				IViewObj viewObj = (IViewObj) it.next();
-				Long obj_id = (Long) viewObj.getRawValue(view_column_obj_id);
-				log.info("RFC obj_id: " + String.valueOf(obj_id));
-				Long version_number = (Long) viewObj.getRawValue(view_column_version_number);
-				log.info("RFC version_number: " + String.valueOf(version_number));
-				
-				IOVID riskOVID = OVIDFactory.getOVID(obj_id.longValue(), version_number.longValue());
-				log.info("RFC riskOVID: " + riskOVID.toString());
-				riskReturn = riskFacade.load(riskOVID, true);
-				log.info("RFC riskOBJ carregado: " + riskReturn.toString());
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				controlID = (Long)viewObj.getRawValue("ct_id");
 				
 			}
-			query.release();
-			return riskReturn;
-			
-		}catch(RightException re){
-			log.info("RFC Exceção Direitos: " + re.getMessage());
-			throw (Exception)re;
-		}catch(ObjectLockException ole){
-			log.info("RFC Exceção Objeto Lockado: " + ole.getMessage());
-//			throw (Exception)ole;
-		}catch(ValidationException ve){
-			log.info("RFC Exceção Validation: " + ve.getMessage());
-//			throw ve;
-		}catch(ObjectNotUniqueException onue){
-			log.info("RFC Exceção Obj Nao Unico: " + onue.getMessage());
-//			throw onue;
-		}catch(ObjectAccessException oae){
-			log.info("RFC Exceção Obj Sem Acesso: " + oae.getMessage());
-//			throw oae;
+		
 		}catch(Exception e){
-			log.info("RFC Exceção Query: " + e.getMessage());
+			query.release();
 			throw e;
-		}*/
+		}finally{
+			query.release();
+		}
+		
+		return controlID;
+		
+	}
+	
+	private IAppObj getRiskFromControl(IAppObj controlObj) throws Exception{
+			
+			IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
+			IAppObjQuery riskQuery = riskFacade.createQuery();
+			IAppObjIterator riskIterator = riskQuery.getResultIterator();
+			IAppObj riskAppObj = null;
+			//log.info("infra para obtenção de risco pronta");
+			
+			while(riskIterator.hasNext()){
+				
+				IAppObj riskObj = riskIterator.next();
+				//log.info("risco lido" + riskObj.getAttribute(IRiskAttributeType.ATTR_NAME).getRawValue());
+				
+				if(!(riskAppObj == null))
+					break;
+				
+				List<IAppObj> ctrlList = riskObj.getAttribute(IRiskAttributeType.LIST_CONTROLS).getElements(this.getUserContext());
+				for(IAppObj ctrlObj : ctrlList){
+					if(ctrlObj.getGuid().equals(controlObj.getGuid())){
+						//log.info("risco do controle" + riskObj.getAttribute(IRiskAttributeType.ATTR_NAME).getRawValue());
+						riskAppObj = riskObj;
+						break;
+					}
+				}
+				
+			}
+			riskQuery.release();
+			
+			return riskAppObj;
+			
+			
+			/*Map filterMap = new HashMap();
+			//filterMap.put("control_obj_id", controlObj.getAttribute(IControlAttributeType.ATTR_CONTROL_ID).getRawValue());
+			log.info("RFC filtermap declarado");
+			log.info("RFC Control ID: " + controlObj.getAttribute(IControlAttributeType.ATTR_CONTROL_ID).getRawValue());
+					
+			IAppObj riskReturn = null;
+			IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
+			log.info("RFC risk facade declarado");
+			log.info("RFC " + riskFacade.toString());
+			
+			log.info(this.viewName);
+			IViewQuery query = QueryFactory.createQuery(this.getUserContext(), this.viewName, filterMap, null,
+					true, this.getDefaultTransaction());
+			
+			log.info(query.getSize());
+			
+			try{
+				
+				log.info("RFC query executada");
+				
+				Iterator it = query.getResultIterator();
+				while(it.hasNext()){
+					
+					log.info("RFC iterator");
+					
+					IViewObj viewObj = (IViewObj) it.next();
+					Long obj_id = (Long) viewObj.getRawValue(view_column_obj_id);
+					log.info("RFC obj_id: " + String.valueOf(obj_id));
+					Long version_number = (Long) viewObj.getRawValue(view_column_version_number);
+					log.info("RFC version_number: " + String.valueOf(version_number));
+					
+					IOVID riskOVID = OVIDFactory.getOVID(obj_id.longValue(), version_number.longValue());
+					log.info("RFC riskOVID: " + riskOVID.toString());
+					riskReturn = riskFacade.load(riskOVID, true);
+					log.info("RFC riskOBJ carregado: " + riskReturn.toString());
+					
+				}
+				query.release();
+				return riskReturn;
+				
+			}catch(RightException re){
+				log.info("RFC Exceção Direitos: " + re.getMessage());
+				throw (Exception)re;
+			}catch(ObjectLockException ole){
+				log.info("RFC Exceção Objeto Lockado: " + ole.getMessage());
+	//			throw (Exception)ole;
+			}catch(ValidationException ve){
+				log.info("RFC Exceção Validation: " + ve.getMessage());
+	//			throw ve;
+			}catch(ObjectNotUniqueException onue){
+				log.info("RFC Exceção Obj Nao Unico: " + onue.getMessage());
+	//			throw onue;
+			}catch(ObjectAccessException oae){
+				log.info("RFC Exceção Obj Sem Acesso: " + oae.getMessage());
+	//			throw oae;
+			}catch(Exception e){
+				log.info("RFC Exceção Query: " + e.getMessage());
+				throw e;
+			}*/
+			
+		}
+
+	private IAppObj getRiskFromControl(long controlObjID) throws Exception{
+		
+		IAppObj riskAppObj = null;
+		long riskID = 0;
+		long riskVersionNumber = 0;
+		
+		Map filterMap = new HashMap();
+		filterMap.put("control_obj_id", controlObjID);
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "customcontrol2risk", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				riskID = (Long)viewObj.getRawValue("risk_obj_id");
+				riskVersionNumber = (Long)viewObj.getRawValue("risk_version_number");
+				
+			}
+		
+			IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
+			IOVID riskOVID = OVIDFactory.getOVID(riskID, riskVersionNumber);
+			riskAppObj = riskFacade.load(riskOVID, true);
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}
+		
+		return riskAppObj;
 		
 	}
 	
@@ -200,14 +295,14 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 			IAppObj riskUpdObj = riskFacade.load(riskOVID, true);
 			riskFacade.allocateWriteLock(riskOVID);
 			
-			IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
+			//IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
 		
 			List<IAppObj> controlList = riskObj.getAttribute(IRiskAttributeType.LIST_CONTROLS).getElements(this.getUserContext());
 			for(IAppObj controlObj : controlList){
 				
-				IOVID controlOVID = controlObj.getVersionData().getHeadOVID();
+				/*IOVID controlOVID = controlObj.getVersionData().getHeadOVID();
 				IAppObj controlUpdObj = controlFacade.load(controlOVID, true);
-				controlFacade.allocateWriteLock(controlOVID);
+				controlFacade.allocateWriteLock(controlOVID);*/
 				
 				//Date ceDate = null;
 				log.info("==================================================");
@@ -217,13 +312,16 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 				
 				List<IAppObj> cetList = controlObj.getAttribute(IControlAttributeType.LIST_CONTROLEXECUTIONTASKS).getElements(this.getUserContext());
 				for(IAppObj cetObj : cetList){
+					if(cetObj.getObjectId() == this.cetObjectId)
+						continue;
 					
-					List<IAppObj> ceList = this.getCtrlExecFromCET(cetObj);
+					//List<IAppObj> ceList = this.getCtrlExecFromCET(cetObj);
+					List<IAppObj> ceList = this.getCtrlExecFromCET(cetObj.getObjectId());
 					for(IAppObj ceObj : ceList){
 						log.info("Data EC: " + String.valueOf(ceObj.getVersionData().getCreateDate().getTime()));
 						
 						if(ceObj.getGuid().equals(this.formModel.getAppObj().getGuid())){
-							if(this.requestContext.getParameter(IControlexecutionAttributeType.STR_OWNER_STATUS).equals("3")){
+							/*if(this.requestContext.getParameter(IControlexecutionAttributeType.STR_OWNER_STATUS).equals("3")){
 								//countTotal += 1;
 								log.info("Status EC: COMPLETED");
 								if(this.currStatus.equals("ineffective")){
@@ -232,7 +330,7 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 								}else{
 									controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("eficaz");
 								}
-							}
+							}*/
 						}else{
 							IEnumAttribute ownerStatusAttr = ceObj.getAttribute(IControlexecutionAttributeType.ATTR_OWNER_STATUS);
 							IEnumerationItem ownerStatus = ARCMCollections.extractSingleEntry(ownerStatusAttr.getRawValue(), true);
@@ -256,10 +354,11 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 					}
 					
 				}
-				controlFacade.save(controlUpdObj, this.getDefaultTransaction(), true);
-				controlFacade.releaseLock(controlOVID);
+				/*controlFacade.save(controlUpdObj, this.getDefaultTransaction(), true);
+				controlFacade.releaseLock(controlOVID);*/
 				
 			}
+			count1line = count1line + this.countInef;
 			riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_INEF1LINE).setRawValue(count1line);
 			riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_FINAL1LINE).setRawValue(countTotal);
 			double risk1line = 0;
@@ -281,7 +380,22 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 				riskClass3line = "";*/
 			
 			//String riskClassFinal = this.riskFinalClassification(riskClass1line, riskClass2line, riskClass3line);
-			String riskClassFinal = riskClass1line;
+			//String riskClassFinal = riskClass1line;
+			String riskClassFinal = "";
+			if((this.control2line.equals("")) && (this.control3line.equals(""))){
+				riskClassFinal = riskClass1line;
+			}else{
+				if((this.control2line.equals("")) && (!this.control2line.equals(""))){
+					riskClassFinal = this.riskFinalClassification(riskClass1line, "", this.control3line);
+				}else{
+					if((!this.control2line.equals("")) && (this.control3line.equals(""))){
+						riskClassFinal = this.riskFinalClassification(riskClass1line, this.control2line, "");
+					}else{
+						riskClassFinal = this.riskFinalClassification(riskClass1line, this.control2line, this.control3line);
+					}
+				}
+			}			
+			
 			if(riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).isEmpty()){
 				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).setRawValue(riskClassFinal);
 				log.info("CONTROLFINAL é Vazio");
@@ -290,12 +404,6 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 				String riskFinal = riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).getRawValue();
 				log.info("riskFinal: " + riskFinal);
 				log.info("riskClass1line: " + riskClass1line);
-				
-				if((!this.control2line.equals("")) || (!this.control3line.equals(""))){
-					riskClassFinal = riskClass1line;
-				}else{
-					riskClassFinal = this.riskFinalClass(riskClass1line, riskFinal);
-				}
 				
 				log.info("riskClassFinal: " + riskClassFinal);
 				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).setRawValue(riskClassFinal);
@@ -414,6 +522,94 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 
 	}
 	
+	private List<IAppObj> getCtrlExecFromCET(long cetObjID) throws Exception{
+		
+		List<IAppObj> retList = new ArrayList<IAppObj>();
+		List<IAppObj> bufList = new ArrayList<IAppObj>();
+		
+		Map filterMap = new HashMap();
+		filterMap.put("cetask_id", cetObjID);
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "custom_CET2CE", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				long ceID = (Long)viewObj.getRawValue("ce_id");
+				long ceVersionNumber = (Long)viewObj.getRawValue("ce_version_number");
+				
+				IAppObjFacade ceFacade = this.environment.getAppObjFacade(ObjectType.CONTROLEXECUTION);
+				IOVID ceOVID = OVIDFactory.getOVID(ceID, ceVersionNumber);
+				IAppObj ceAppObj = ceFacade.load(ceOVID, true);
+				
+				if(ceAppObj != null)
+					bufList.add(ceAppObj);
+				
+			}
+			
+			if(bufList.size() > 0){
+				bufList.sort(new Comparator<IAppObj>(){
+					@Override
+					public int compare(IAppObj ant, IAppObj post){
+						long antTime = ant.getVersionData().getCreateDate().getTime();
+						long postTime = post.getVersionData().getCreateDate().getTime();
+						return antTime < postTime ? -1 : antTime == postTime ? 0 : 1;
+					}
+				});
+				retList.add(bufList.get(bufList.size() - 1));
+			}
+		
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}
+		
+		return (List<IAppObj>)retList;
+		
+	}
+	
+	private void controlClassification(List<IAppObj> controlList) throws Exception{
+		
+		IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
+		IOVID ovid = null;
+		try{
+		
+			Iterator itControl = controlList.iterator();
+			while(itControl.hasNext()){
+				
+				IAppObj controlObj = (IAppObj)itControl.next();
+				IOVID controlOVID = controlObj.getVersionData().getHeadOVID();
+				ovid = controlOVID;
+				IAppObj controlUpdObj = controlFacade.load(controlOVID, true);
+				controlFacade.allocateLock(controlOVID, LockType.FORCEWRITE);
+				
+				if(this.currStatus.equals("ineffective")){
+					controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("ineficaz");
+				}else{
+					controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("eficaz");
+				}
+				
+				controlFacade.save(controlUpdObj, this.getDefaultTransaction(), true);
+				controlFacade.releaseLock(controlOVID);
+				
+				break;
+				
+			}
+		
+		}catch(Exception e){
+			controlFacade.releaseLock(ovid);
+			throw e;
+		}
+		
+	}
+	
 	private String riskClassification(double riskVuln){
 		
 		String riskClassif = "";
@@ -445,35 +641,41 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 		int height_3line = 0;
 		String riskClassFinal = "";
 		
-		//Classificação - Amb. Controles 1a Linha
-		if(risk1line.equalsIgnoreCase("Muito Alto"))
-			height_1line = 4;
-		if(risk1line.equalsIgnoreCase("Alto"))
-			height_1line = 3;
-		if(risk1line.equalsIgnoreCase("Médio"))
-			height_1line = 2;
-		if(risk1line.equalsIgnoreCase("Baixo"))
-			height_1line = 1;
+		if(!risk1line.equals("")){
+			//Classificação - Amb. Controles 1a Linha
+			if(risk1line.equalsIgnoreCase("Muito Alto"))
+				height_1line = 4;
+			if(risk1line.equalsIgnoreCase("Alto"))
+				height_1line = 3;
+			if(risk1line.equalsIgnoreCase("Médio"))
+				height_1line = 2;
+			if(risk1line.equalsIgnoreCase("Baixo"))
+				height_1line = 1;
+		}
 		
-		//Classificação - Amb. Controles 2a Linha
-		if(risk2line.equalsIgnoreCase("Muito Alto"))
-			height_2line = 4;
-		if(risk2line.equalsIgnoreCase("Alto"))
-			height_2line = 3;
-		if(risk2line.equalsIgnoreCase("Médio"))
-			height_2line = 2;
-		if(risk2line.equalsIgnoreCase("Baixo"))
-			height_2line = 1;
+		if(!risk2line.equals("")){
+			//Classificação - Amb. Controles 2a Linha
+			if(risk2line.equalsIgnoreCase("Muito Alto"))
+				height_2line = 4;
+			if(risk2line.equalsIgnoreCase("Alto"))
+				height_2line = 3;
+			if(risk2line.equalsIgnoreCase("Médio"))
+				height_2line = 2;
+			if(risk2line.equalsIgnoreCase("Baixo"))
+				height_2line = 1;
+		}
 		
-		//Classificação - Amb. Controles 3a Linha
-		if(risk3line.equalsIgnoreCase("Muito Alto"))
-			height_3line = 4;
-		if(risk3line.equalsIgnoreCase("Alto"))
-			height_3line = 3;
-		if(risk3line.equalsIgnoreCase("Médio"))
-			height_3line = 2;
-		if(risk3line.equalsIgnoreCase("Baixo"))
-			height_3line = 1;		
+		if(!risk3line.equals("")){
+			//Classificação - Amb. Controles 3a Linha
+			if(risk3line.equalsIgnoreCase("Muito Alto"))
+				height_3line = 4;
+			if(risk3line.equalsIgnoreCase("Alto"))
+				height_3line = 3;
+			if(risk3line.equalsIgnoreCase("Médio"))
+				height_3line = 2;
+			if(risk3line.equalsIgnoreCase("Baixo"))
+				height_3line = 1;
+		}
 		
 		int maxHeightCtrl = Math.max(height_1line, Math.max(height_2line, height_3line));
 		switch(maxHeightCtrl){
@@ -581,6 +783,18 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 			riskResidualReturn = "Médio";
 		
 		if(riskPotencial.equals("Médio") && riskControlFinal.equals("Baixo"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Muito Alto"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Alto"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Médio"))
+			riskResidualReturn = "Baixo";
+		
+		if(riskPotencial.equals("Baixo") && riskControlFinal.equals("Baixo"))
 			riskResidualReturn = "Baixo";
 		
 		return riskResidualReturn;

@@ -36,7 +36,7 @@ public class IssueAgingReplanJob extends BaseJob {
 	private static final long serialVersionUID = 1L;
 	private static final boolean DEBUGGER_ON = true;
 //	public static final String KEY_JOB_NAME = EnumerationsCustom.CUSTOM_JOBS.ISSUE_SLA.getPropertyKey();
-	public static final String KEY_JOB_NAME = "Teste";
+	public static final String KEY_JOB_NAME = "enumeration.IssueAgingReplanJob.DBI";
 		
 	private static final com.idsscheer.batchserver.logging.Logger logger = new com.idsscheer.batchserver.logging.Logger();
 
@@ -87,6 +87,10 @@ public class IssueAgingReplanJob extends BaseJob {
 				IEnumerationItem issueReviewerStatus = ARCMCollections.extractSingleEntry(issueReviewerStatusList.getRawValue(), true);
 				this.displayLog("Tipo - :" + issueReviewerStatusList.getRawValue());
 		
+				IEnumAttribute issueOwnerStatusList = iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_AP_OWNER_STATUS);
+				IEnumerationItem issueOwnerStatus = ARCMCollections.extractSingleEntry(issueOwnerStatusList.getRawValue(), true);
+				this.displayLog("Tipo - :" + issueReviewerStatusList.getRawValue());
+				
 				/*
 				 * Apenas os "apontamentos" que são plano de ação.
 				 */
@@ -103,8 +107,9 @@ public class IssueAgingReplanJob extends BaseJob {
 					
 					this.displayLog("Este objeto é um plano de ação." + issueActionType);
 					
-					if(issueReviewerStatus == EnumerationsCustom.CENUM_AP_REVIEWER_STATUS.ATTENDED ||
-					   issueReviewerStatus == EnumerationsCustom.CENUM_AP_REVIEWER_STATUS.FUP ){
+					//if(issueReviewerStatus == EnumerationsCustom.CENUM_AP_REVIEWER_STATUS.ATTENDED ||
+					//   issueReviewerStatus == EnumerationsCustom.CENUM_AP_REVIEWER_STATUS.FUP ){
+						if(issueReviewerStatus == EnumerationsCustom.CENUM_AP_REVIEWER_STATUS.FUP ){
 						this.displayLog("Inicio -----------------------");
 						Date datePlanIni = iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PLANDTINI).getRawValue();						
 						Date datePlanFin = iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).getRawValue();
@@ -150,9 +155,10 @@ public class IssueAgingReplanJob extends BaseJob {
 						 
 					}
 
-					else {
+				//	else {
 					
-						if(issueReviewerStatus == EnumerationsCustom.CENUM_AP_OWNER_STATUS.PENDING){
+						//if(issueReviewerStatus == EnumerationsCustom.CENUM_AP_OWNER_STATUS.PENDING){
+						if(issueOwnerStatus == EnumerationsCustom.CENUM_AP_OWNER_STATUS.PENDING){
 									this.displayLog("Inicio Pendente -----------------------");
 									Date datePlanIni = iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PLANDTINI).getRawValue();						
 									Date datePlanFin = iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).getRawValue();
@@ -161,10 +167,12 @@ public class IssueAgingReplanJob extends BaseJob {
 									this.displayLog("Fim = " + datePlanFin);
 									this.displayLog("Data atual = " + actualDate );
 									 
+																		
 									if(datePlanFin.before(actualDate)){										
 									
 									int difference =  ADateHelper.calculateDifference(actualDate, datePlanIni );
 									
+																
 									if(difference <= 30){
 										this.displayLog(dif01 + difference);
 										iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_AGING_PEND).setRawValue(dif01);
@@ -201,7 +209,7 @@ public class IssueAgingReplanJob extends BaseJob {
 						}
 						
 						
-					}
+					
 					
 					
 

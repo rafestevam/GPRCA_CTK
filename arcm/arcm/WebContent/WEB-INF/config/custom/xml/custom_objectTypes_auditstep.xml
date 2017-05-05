@@ -56,19 +56,20 @@
     <!-- Customizations of GAU01 -->
     
     <longAttrType id="percentage_completed" defaultValue="0" precision="3:0"/>
+    <longAttrType id="percentage_total" defaultValue="100" precision="3:0"/>
     
-    <listAttrType id="area" maxSize="1" objectType.idref="HIERARCHY" linkType="21005"> <!-- linktype? -->
+    <listAttrType id="area" objectType.idref="HIERARCHY" linkType="21005"> <!-- linktype? -->
             <listRestriction>
                 <attributeRestriction attribute="type" value="orgunit"/>
             </listRestriction>
         </listAttrType>
-        <listAttrType id="process" maxSize="1" objectType.idref="HIERARCHY" linkType="21006">
+        <listAttrType id="process" objectType.idref="HIERARCHY" linkType="21006">
             <!-- Add List Restrictions -->
             <listRestriction>
                 <attributeRestriction attribute="type" value="process"/>
             </listRestriction>
         </listAttrType>
-        <listAttrType id="subprocess" maxSize="1" objectType.idref="HIERARCHY" linkType="21007">
+        <listAttrType id="subprocess" objectType.idref="HIERARCHY" linkType="21007">
             <!-- Add List Restrictions -->
             <listRestriction>
                 <attributeRestriction attribute="type" value="process"/>

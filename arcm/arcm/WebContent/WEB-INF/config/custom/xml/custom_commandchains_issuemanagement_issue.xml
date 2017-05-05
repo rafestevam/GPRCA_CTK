@@ -11,7 +11,7 @@
             <command id="update">
                 <parameter name="creator" value="$user"/>
             </command>
-<!--             <command id="customUpdCreatorStatus"/>GAP - GRC66    -->
+            <command id="customUpdCreatorStatus"/><!-- GAP - GRC66    --> 
         </commandchain>
 
         <commandchain id="insertCreation">
@@ -166,6 +166,18 @@
 <!--             </command> -->
             <command id="update">
                 <parameter name="custom_ap_owner_status" value="in_progress"/>
+            </command>
+            <command id="issueNotApprovedSendMail"/>
+            <command id="customUpdateStatus"/>
+        </commandchain>
+        
+        <commandchain id="apReopenedDirect">
+            <command id="closingObjectDialog" />
+<!--             <command id="update"> -->
+<!--                 <parameter name="owner_status" value="in_progress"/> -->
+<!--             </command> -->
+            <command id="update">
+                <parameter name="custom_ap_creator_status" value="new"/>
             </command>
             <command id="issueNotApprovedSendMail"/>
             <command id="customUpdateStatus"/>

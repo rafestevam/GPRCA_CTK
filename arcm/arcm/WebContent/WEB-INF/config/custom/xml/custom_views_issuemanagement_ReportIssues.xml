@@ -12,6 +12,7 @@
             <viewColumn id="ra_residualfinal" attributeType="ra_residualfinal" isSelectColumn="true" isSortable="true" isGrouped="true"/>
             <viewColumn id="recurrent" attributeType="recurrent" isSelectColumn="true" isSortable="true" isGrouped="true"/>
             <viewColumn id="process_environment" attributeType="process_environment" isSelectColumn="true" isSortable="true" isGrouped="true"/>
+            <viewColumn id="cst_appsystem" attributeType="cst_appsystem" isSelectColumn="true" isSortable="true" isGrouped="true"/>
             <viewColumn id="cst_modelname" attributeType="cst_modelname" isSelectColumn="true" isSortable="true" isGrouped="true"/>
             <viewColumn id="cst_process" attributeType="cst_process" isSelectColumn="true" isSortable="true" isGrouped="true"/>
             <!--<viewColumn id="issueRelevantObjects" attributeType="issueRelevantObjects" isSelectColumn="true" isSortable="true" isGrouped="true"/>-->
@@ -57,6 +58,7 @@
                 <condition column.id="issue_date2" compareType="LE"/>
                 <!--<condition column.id="issueRelevantObjects" compareType="EQ"/>-->
                 <condition column.id="replanned" compareType="EQ"/>
+                <condition column.id="cst_appsystem" compareType="EQ"/>
 
                 <!--<compoundCondition conditionConnect="OR">
                     <condition column.id="owner_version_active" compareType="EQ" value="true"/>

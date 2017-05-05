@@ -83,6 +83,7 @@ public class EnumerationsCustom extends Enumerations {
 		public static final EnumerationWrapper ENUM = new EnumerationWrapper("custom_jobs");
 		public static final IEnumerationItem ISSUE_PENDING = EnumerationsCustom.lookupEnumerationItem(ENUM, "updateIssuesJob");
 		public static final IEnumerationItem ISSUE_SLA = EnumerationsCustom.lookupEnumerationItem(ENUM, "updateIssueSLAUpdateJob");
+		public static final IEnumerationItem RA_MAIL = EnumerationsCustom.lookupEnumerationItem(ENUM, "RiskassessmentDelayMailJob");
 	}
 	
 	public static abstract interface CUSTOM_PROGRESS {

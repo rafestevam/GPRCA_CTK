@@ -21,7 +21,7 @@
          <enumitem id="conform" value="4" image="iconlib/icons/states/state_effective_16.png">
             <parameter name="Background" value="ADCF00"/>  <!-- green -->
         </enumitem>
-        <enumitem id="notconform" value="-10" evaluationRelevant="false" filterRelevant="false" virtualScope.idrefs="completed" image="iconlib/icons/states/state_noneffective_16.png">
+        <enumitem id="notconform" value="5" image="iconlib/icons/states/state_noneffective_16.png">
             <parameter name="Background" value="EF4231"/>  <!-- red -->
         </enumitem>
         <enumitem id="notauditable" value="-11" evaluationRelevant="false" filterRelevant="false" virtualScope.idrefs="completed" image="iconlib/icons/states/state_not_testable_16.png">

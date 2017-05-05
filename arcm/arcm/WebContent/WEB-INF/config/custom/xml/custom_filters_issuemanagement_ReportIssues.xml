@@ -31,7 +31,9 @@
             </filterElement>
             </filterCell>
         </filterRow>
-
+       <filterRow id="cst_appsystem">
+            <filterElement dataReference.idref="cst_appsystem"  />
+        </filterRow>
     </filter>
    
 </custom>    

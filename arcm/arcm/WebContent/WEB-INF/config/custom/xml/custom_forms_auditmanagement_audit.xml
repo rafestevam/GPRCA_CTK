@@ -97,6 +97,14 @@
                 </row>
             </rowGroup>
             <rowGroup id="audit.2">
+
+                <row id="progressCustom" protocolRelevant="false" propertyKey="form.row.audit.progress.DBI">
+                    <element attribute.idref="obj_id" template="formCompleteness">
+                        <parameter name="viewName" value="customShowAuditCompleteness"/>
+                        <parameter name="totalProperty" value="percentage_total"/>
+                        <parameter name="progressProperty" value="percentage_completed"/>
+                    </element>
+                </row>
                 <!-- Preparation start date copied from audit template -->
                 <row id="plannedstartdate">
                     <element attribute.idref="plannedstartdate"/>
@@ -128,7 +136,7 @@
                     </element>
                 </row>
             </rowGroup>
-            <rowGroup id="audit.3">
+            <!--<rowGroup id="audit.3">
                 <row id="progress" protocolRelevant="false" propertyKey="form.row.audit.progress.DBI">
                     <element attribute.idref="obj_id" template="formCompleteness">
                         <parameter name="viewName" value="showAuditCompleteness"/>
@@ -136,7 +144,7 @@
                         <parameter name="progressProperty" value="completed"/>
                     </element>
                 </row>
-            </rowGroup>
+            </rowGroup>-->
             <rowGroup id="audit.4">
                 <row id="duestatus">
                     <element attribute.idref="duestatus"/>

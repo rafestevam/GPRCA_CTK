@@ -212,10 +212,10 @@
             <viewColumn id="r_cat" attributeType="name"/>
         </viewObject>
         <viewObject id="VO_risk2RM_orgunit" objectType="HIERARCHY">
-            <viewColumn id="r_org" attributeType="name"/>
+            <viewColumn id="r_org" attributeType="name" isSelectColumn="true" mashzoneRelevant="true"/>
         </viewObject>
         <viewObject id="VO_risk2RM_appSys" objectType="HIERARCHY">
-            <viewColumn id="r_app" attributeType="name"/>
+            <viewColumn id="r_app" attributeType="name" isSelectColumn="true" mashzoneRelevant="true"/>
         </viewObject>
         <link linktype.id="3160" firstViewObject="VO_risk2RM_risk" secondViewObject="VO_risk2RM_own"/>
         <link linktype.id="3161" firstViewObject="VO_risk2RM_risk" secondViewObject="VO_risk2RM_reviewer"/>

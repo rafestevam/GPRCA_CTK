@@ -5,16 +5,22 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.Locale;
 
 import com.idsscheer.webapps.arcm.bl.authentication.context.IUserContext;
 import com.idsscheer.webapps.arcm.bl.framework.command.ChainContext;
+import com.idsscheer.webapps.arcm.bl.framework.command.IChainContext;
 import com.idsscheer.webapps.arcm.bl.framework.jobs.BaseJob;
 import com.idsscheer.webapps.arcm.bl.framework.jobs.BaseJob;
 import com.idsscheer.webapps.arcm.bl.framework.jobs.generic.CanBeScheduled;
+import com.idsscheer.webapps.arcm.bl.framework.jobs.util.JobMessageContainer;
+import com.idsscheer.webapps.arcm.bl.framework.jobs.util.LinkedListInformation;
+import com.idsscheer.webapps.arcm.bl.framework.jobs.util.MessageInformation;
 import com.idsscheer.webapps.arcm.bl.framework.jobs.generic.CanBeScheduled;
 import com.idsscheer.webapps.arcm.bl.framework.message.IMessage;
 import com.idsscheer.webapps.arcm.bl.framework.message.MessageFactory;
@@ -38,7 +44,10 @@ import com.idsscheer.webapps.arcm.common.constants.metadata.EnumerationsCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.EnumerationsCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
+import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IClientAttributeType;
+import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IObjectAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskassessmentAttributeType;
+import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITransactionalAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IUsergroupAttributeType;
 import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
@@ -46,6 +55,7 @@ import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
 import com.idsscheer.webapps.arcm.config.metadata.objecttypes.AttributeDataType;
+import com.idsscheer.webapps.arcm.config.metadata.objecttypes.IObjectType;
 import com.idsscheer.webapps.arcm.config.metadata.objecttypes.IStringAttributeType;
 import com.idsscheer.webapps.arcm.config.smtp.ASMTPConfiguration;
 import com.idsscheer.webapps.arcm.services.InfrastructureServiceFactory;
@@ -84,6 +94,7 @@ public class RADelayMailJob extends BaseJob {
 						raDelayObj,
 						cc);
 				//processedObj += 1L;
+				//this.sendNotificationMail(cc, cc.getUserContext(), raDelayObj);
 				super.increaseEditedObjectsCounter();
 				
 			}
@@ -190,7 +201,7 @@ public class RADelayMailJob extends BaseJob {
 			for(IAppObj toUser : toUsers){
 				
 				IMessage message = createMessage(triggeringAppObj, initiator, toUser);
-				cc.send(message);		
+				cc.send(message);
 				
 			}
 		
@@ -198,10 +209,35 @@ public class RADelayMailJob extends BaseJob {
 		
 	}
 	
+	private void sendNotificationMail(IChainContext cc, IUserContext userCtx, IAppObj raObj){
+		
+		//IEnumerationItem initiator = EnumerationsCustom.CUSTOM_INITIATORS.RISKOWNER_NOTIFICATION;
+		String templateID = "riskowner_notification";
+		IEnumerationItem initiator = Enumerations.INITIATORS.ENUM.getItemById(templateID);
+		
+		Set receiverOVIDsSet = this.readReceivers(raObj, userContext);
+		
+		String clientSign = raObj.getAttribute(IObjectAttributeType.BASE_ATTR_CLIENT_SIGN).getRawValue()
+				.getAttribute(IClientAttributeType.ATTR_SIGN).getRawValue();
+
+		//LinkedListInformation linkedListInformation = getLinkedListInformation(cc);
+		LinkedListInformation llInfo = new LinkedListInformation("", "", "", "");
+
+		MessageInformation messageInformation = new MessageInformation(initiator, receiverOVIDsSet, clientSign,
+				raObj.getObjectType(), llInfo);
+		
+		JobMessageContainer messageContainer = (JobMessageContainer) cc.get("MESSAGE_CONTAINER");
+
+		if (messageContainer != null) {
+			messageContainer.addMessageInformation(messageInformation);
+		}
+		
+	}
+	
 	private IMessage createMessage(IAppObj p_triggeringAppObj, IEnumerationItem p_initiator,
 			IAppObj toUser) {
 		//String fromUser = this.userContext.getExtendedID();
-		String fromUser = null;
+		String fromUser = "SuporteCIP@cip-bancos.org.br";
 		IUserContext userContext = this.userContext;
 		
 		MessageUtility mu = MessageUtility.getInstance();
@@ -230,6 +266,33 @@ public class RADelayMailJob extends BaseJob {
 			return MessageFactory.createMessage(toUser, p_initiator, userContext.getUser(), p_triggeringAppObj);
 		}
 		return MessageFactory.createMessage(toUser, p_initiator, (IAppObj) users.get(0), p_triggeringAppObj);
+	}
+	
+	private Set<IOVID> readReceivers(IAppObj obj, IUserContext userContext) {
+		Set receiverOVIDsSet = new HashSet();
+
+		for (IAppObj ownerGroup : obj.getAttribute(ITransactionalAttributeType.LIST_OWNER_GROUP)
+				.getElements(userContext)) {
+			for (IAppObj user : ownerGroup.getAttribute(IUsergroupAttributeType.LIST_GROUPMEMBERS)
+					.getElements(userContext)) {
+				if (!(user.getVersionData().isDeleted()))
+					;
+				IOVID userOVID = user.getVersionData().getOVID();
+				receiverOVIDsSet.add(userOVID);
+			}
+		}
+		if (!(receiverOVIDsSet.isEmpty())) {
+			return receiverOVIDsSet;
+		}
+
+		for (IAppObj user : obj.getAttribute(ITransactionalAttributeType.LIST_OWNER).getElements(userContext)) {
+			if (!(user.getVersionData().isDeleted()))
+				;
+			IOVID userOVID = user.getVersionData().getOVID();
+			receiverOVIDsSet.add(userOVID);
+		}
+
+		return receiverOVIDsSet;
 	}
 	
 }

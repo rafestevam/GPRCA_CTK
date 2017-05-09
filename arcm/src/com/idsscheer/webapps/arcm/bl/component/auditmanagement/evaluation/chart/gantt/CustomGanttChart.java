@@ -331,7 +331,7 @@ class CustomGanttChart {
         int cArrowColor = shadow ? Chart.CColor(shadowColor) : Chart.CColor(CONNECTION_ARROW_COLOR);                        
         int width = shadow ? 3 : 1;
         
-        if (data.getActivity(ids[0]).getObjectType().equals("AUDIT") || data.getActivity(ids[0]).getObjectType().equals("AUDITTEMPLATE")) {
+      //  if (data.getActivity(ids[0]).getObjectType().equals("AUDIT") || data.getActivity(ids[0]).getObjectType().equals("AUDITTEMPLATE")) {
         	int gap = 10;
             String id = ids[0];
             CustomActivityData mainActivity = data.getActivity(id);  
@@ -371,8 +371,8 @@ class CustomGanttChart {
                     chart.addLine(toXCoor - 7, toYCoor -  7, toXCoor, toYCoor - 10, cArrowColor, width);
                 }
             }
-        	
-        } else {
+       /*Código comentado em 07/05/2017 ****( INICIO )***   */  	
+       /* } else {
         	for (int index = 0; index < ids.length -1; index++) {
                 int gap = 10;
                 String id = ids[index];
@@ -414,9 +414,8 @@ class CustomGanttChart {
                     }
                 }
             }
-        }
-        
-        
+        }*/
+        /*Código comentado em 07/05/2017 ****( FIM )***   */                
     }
 
     private Color getBoxColor() {

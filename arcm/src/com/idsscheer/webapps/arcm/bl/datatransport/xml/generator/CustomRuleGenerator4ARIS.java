@@ -35,6 +35,11 @@ public class CustomRuleGenerator4ARIS extends XMLImportMigrationRuleGenerator4AR
 		if (smd.getDataLayerObjectType().getName().equalsIgnoreCase(ObjectType.RISK.getId())){
 			printColumnMap("setStartDate", ObjectType.RISK.getId(), "startdate", "startdate");
 			printColumnMap("setEndDate", ObjectType.RISK.getId(), "enddate", "enddate");
+			printColumnMap("setRAResult", ObjectType.RISK.getId(), "ra_result", "ra_result");
+			printColumnMap("setRAControl1Line", ObjectType.RISK.getId(), "ra_control1line", "ra_control1line");
+			printColumnMap("setRAControl2Line", ObjectType.RISK.getId(), "ra_control2line", "ra_control2line");
+			printColumnMap("setRAControl3Line", ObjectType.RISK.getId(), "ra_control3line", "ra_control3line");
+			printColumnMap("setRAControlFinal", ObjectType.RISK.getId(), "ra_controlfinal", "ra_controlfinal");
 		}
 	}
 	

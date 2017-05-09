@@ -160,13 +160,13 @@
                 true -> when an object date is not equal, arcm objects where overwriten by the import
                 false-> importdata where ignored when the arcm object is younger than the import object
             -->
-            <parameter name="forceImport" value="true"/>
+            <parameter name="forceImport" value="false"/>
 
             <!--
                        true -> fills attribute with the default value if the attribute is not set from the aris import file
                        false -> don't use default values in the aris import
                    -->
-            <parameter name="application.migration.framework.consider.default.values" value="true"/>
+            <parameter name="application.migration.framework.consider.default.values" value="false"/>
 
             <!--
                 Switch for XMLImport modus : ARIS only
@@ -174,7 +174,7 @@
                 false: only if an object is changed, it will be written a new version. To decide that, every attribute
                   of the object will be checked if the values are the same. If not, the object will be imported.
             -->
-            <parameter name="useARISChangeDate" value="true"/>
+            <parameter name="useARISChangeDate" value="false"/>
 
             <!-- specify the the name of the used tenant -->
             <parameter name="umc.tenant" value="default"/>
@@ -416,7 +416,7 @@
         <parameterList name="RADelayMailJob">
         	<parameter name="jobitem" value="RADelayMailJob"/>
         	<parameter name="startScheduler" value="true"/>
-        	<parameter name="executionTime" value="0 44 21 ? * SUN-SAT"/>
+        	<parameter name="executionTime" value="0 42 19 ? * SUN-SAT"/>
         	<parameter name="clientexcludinglist" value="" />
         	<parameter name="className" value="RADelayMailJob" />
         	<parameter name="clientbased" value="false"/>
@@ -427,7 +427,7 @@
 		<parameterList name="IssueAgingReplanJob">
             <parameter name="jobitem" value="IssueAgingReplanJob" />
             <parameter name="startScheduler" value="true"/>
-            <parameter name="executionTime" value="0 02 01 ? * SUN-SAT"/>
+            <parameter name="executionTime" value="0 01 02 ? * SUN-SAT"/>
             <!-- comma separated client-signs of clients that should be excluded -->
             <parameter name="clientexcludinglist" value=""/>
             <!-- please do not edit -->
@@ -450,15 +450,15 @@
     </section>
 
     <!-- configuration of smtp mailing -->
-    <section id="mailing">
-        <parameterList name="smtp">
-            <parameter name="smtp.host" value="[smtp.server]"/>
-            <parameter name="smtp.account" value=""/>
-            <parameter name="smtp.password" value=""/>
-            <parameter name="default.sender.address" value="changeEmail@example.com"/>
-            <parameter name="mail.debug" value="false"/>
-        </parameterList>
-    </section>
+<!--     <section id="mailing"> -->
+<!--         <parameterList name="smtp"> -->
+<!--             <parameter name="smtp.host" value="smtp.mail.yahoo.com"/> -->
+<!--             <parameter name="smtp.account" value="arcmsag@yahoo.com"/> -->
+<!--             <parameter name="smtp.password" value="Exed@2017"/> -->
+<!--             <parameter name="default.sender.address" value="arcmsag@yahoo.com"/> -->
+<!--             <parameter name="mail.debug" value="true"/> -->
+<!--         </parameterList> -->
+<!--     </section> -->
 
     <!-- configuration of files needed in ARCM -->
     <section id="files">

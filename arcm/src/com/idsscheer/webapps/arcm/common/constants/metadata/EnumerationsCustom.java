@@ -3,7 +3,7 @@ package com.idsscheer.webapps.arcm.common.constants.metadata;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.EnumerationWrapper;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumeration;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
-import com.idsscheer.webapps.arcm.config.metadata.enumerations.JobEnumerationItem;
+import com.idsscheer.webapps.arcm.config.metadata.enumerations.MessageTemplateEnumerationItem;
 
 public class EnumerationsCustom extends Enumerations {
 
@@ -91,5 +91,12 @@ public class EnumerationsCustom extends Enumerations {
 		public static final IEnumerationItem ON_TIME = EnumerationsCustom.lookupEnumerationItem(ENUM, "on_time");
 		public static final IEnumerationItem OVERDUE = EnumerationsCustom.lookupEnumerationItem(ENUM, "overdue");
 	}
+	
+	public static abstract interface CUSTOM_INITIATORS {
+		public static final EnumerationWrapper ENUM = new EnumerationWrapper("initiators");
+		public static final MessageTemplateEnumerationItem RISKOWNER_NOTIFICATION = (MessageTemplateEnumerationItem) EnumerationsCustom.lookupEnumerationItem(ENUM, "riskowner_notification");
+	}
+	
+	
 	
 }

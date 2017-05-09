@@ -34,9 +34,11 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 	private String column_reviewer_status = "reviewerStatus";
 	private String column_obj_id = "is_id";
 	private String column_plannedenddate = "plannedenddate";
-	private int count_is_open = 0;
-	private int count_is_progress = 0;
-	private int count_is_fup = 0;
+	private String column_deactivated = "deactivated";
+	//private int count_is_open = 0;
+	//private int count_is_progress = 0;
+	//private int count_is_fup = 0;
+	private long deactivated;
 		
 	private static final boolean DEBUGGER_ON = true;
 	protected void afterExecute(){
@@ -45,7 +47,8 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 		IAppObj currIssueAppObj = this.formModel.getAppObj();
 		IListAttribute iroList = currIssueAppObj.getAttribute(IIssueAttributeType.LIST_ISSUERELEVANTOBJECTS);
 		List<IAppObj> iroElements = iroList.getElements(this.getUserContext());
-		Iterator<IAppObj> iroIterator = iroElements.iterator();
+		//Iterator<IAppObj> iroIterator = iroElements.iterator();
+		
 		
 		IAppObjFacade issueFacade = this.environment.getAppObjFacade(ObjectType.ISSUE);
 		
@@ -57,13 +60,14 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 		 if(issueType.getId().equals("actionplan")){					
 			this.displayLog("Tipo : " + issueType.getId());		
 
-			//this.formModel.addControlInfoMessage(NotificationTypeEnum.INFO, "Data Fim: " + iroIterator.hasNext(), new String[] { getStringRepresentation(this.formModel.getAppObj()) });
-			
+		
 			try{
 
-				while(iroIterator.hasNext()){
+				//while(iroIterator.hasNext()){
+				for(int i = 0; i < iroElements.size(); i++){
 					
-					IAppObj iroAppObj = iroIterator.next();
+					//IAppObj iroAppObj = iroIterator.next();
+					IAppObj iroAppObj = iroElements.get(i);
 					IOVID iroOVID = iroAppObj.getVersionData().getHeadOVID();
 					IAppObj iroUpdObj = issueFacade.load(iroOVID, true);
 							
@@ -71,10 +75,10 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 					
 						continue;
 					
-					issueFacade.allocateWriteLock(iroUpdObj.getVersionData().getHeadOVID());
-				
-					IDateAttribute actplnenddate = currIssueAppObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE);
-					Date actplnenddateValue = actplnenddate.getRawValue();
+
+					issueFacade.allocateWriteLock(iroOVID);
+					
+					Long version = currIssueAppObj.getAttribute(IIssueAttributeType.BASE_ATTR_VERSION_NUMBER).getRawValue();
 					
 					IDateAttribute issueenddate = iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE);
 					Date issueendtateValue = issueenddate.getRawValue();
@@ -82,8 +86,6 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 					IDateAttribute currDataFim = currIssueAppObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE);
 					Date currDataFimValue = currDataFim.getRawValue();
 	
-					IDateAttribute dataFim = iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE);								
-					Date dataFimValue = dataFim.getRawValue();
 							
 					IDateAttribute dataIni = currIssueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PLANDTINI);
 					Date dataPlanIni = dataIni.getRawValue();
@@ -95,9 +97,13 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 					
 					this.displayLog("Reschedule  : " + s_resch );		
 					
+				 
 					// Last Date List
 					filterMap.put(this.filterColumn, iroUpdObj.getObjectId());
-					List<CustomIssueObj> listObj = this.getIssuesFromIRO(this.viewName, filterMap);					
+					Map listObjMap = this.getIssuesFromIRO(this.viewName, filterMap);
+					List <CustomIssueObj> listObj = (List<CustomIssueObj>)listObjMap.get("list");
+					int qtd = (Integer)listObjMap.get("qtd");
+					//List<CustomIssueObj> listObj = this.getIssuesFromIRO(this.viewName, filterMap);					
 					
 						CustomIssueObj cstIssue = listObj.iterator().next();						
 						Date lastDateList = cstIssue.getObjDate();								
@@ -111,13 +117,7 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 							currIssueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PLANDTINI).setRawValue(currDataFimValue);
 							
 						}
-
-			/*		if(actplnenddateValue.after(issueendtateValue)){
-					
-						iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_PLANNEDENDDATE).setRawValue(actplnenddateValue);
-						//iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
-					}*/
-					
+				
 					iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
 					this.displayLog("Data DataFim corrente : " + currDataFimValue );
                     
@@ -130,62 +130,37 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 					
 					issueFacade.save(currIssueAppObj, this.getDefaultTransaction(), true);
 					issueFacade.releaseLock(currIssueAppObj.getVersionData().getHeadOVID());
-					/*
-					if(currDataFimValue.after(dataFimValue)){
 
-						iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(currDataFimValue);
-						
-						this.displayLog("Data Replanejada : " + currDataFimValue );
-						issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);
-						issueFacade.releaseLock(iroUpdObj.getVersionData().getHeadOVID());
-						
-					}*/
-					
-					
-					//if(currDataFimValue.after(dataFimValue)){
-					if(lastDateList.equals(null)) {
-						
-						iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(currDataFimValue);
-						this.displayLog("Data Replanejada : " + lastDateList );
-						issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);
-						issueFacade.releaseLock(iroUpdObj.getVersionData().getHeadOVID());
-						
+					if( qtd== 1 && version == 1){
+						iroAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
+						iroAppObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(lastDateList);
+						issueFacade.save(iroAppObj, this.getDefaultTransaction(), true);
+						issueFacade.releaseLock(iroAppObj);							
 					}else{
-						//if( s_resch >= 1){
+						iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_REPLANNED).setRawValue("True");
 						iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(lastDateList);
-						issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);						
-						issueFacade.releaseLock(iroUpdObj.getVersionData().getHeadOVID());
-						//}else{
-							//this.formModel.addControlInfoMessage(NotificationTypeEnum.INFO, "Click em Salvar para replanjar " , new String[] { getStringRepresentation(this.formModel.getAppObj()) });
-							
-						//}
-					}
-								
-
+						issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);
+						issueFacade.releaseLock(iroOVID);
+					}				
+					
 					break;
 					
 					}else{
-									
-						// Last Date List
-						filterMap.put(this.filterColumn, iroUpdObj.getObjectId());
-						List<CustomIssueObj> lstObj = this.getIssuesFromIRO(this.viewName, filterMap);					
-						
+			
 							CustomIssueObj cstIssues = listObj.iterator().next();						
 							Date lastDateLists = cstIssues.getObjDate();	
+							
 						
-						//this.displayLog("DaTa issue date : " + issueendtateValue );												
-						//iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_PLANNEDENDDATE).setRawValue(actplnenddateValue);
-							
-							iroUpdObj.getAttribute(IIssueAttributeTypeCustom.ATTR_PLANNEDENDDATE).setRawValue(lastDateLists);
-							issueFacade.save(currIssueAppObj, this.getDefaultTransaction(), true);
-							issueFacade.releaseLock(currIssueAppObj.getVersionData().getHeadOVID());
-							
+						if( qtd == 1 && version == 1){
+							iroAppObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(lastDateList);
+							issueFacade.save(iroAppObj, this.getDefaultTransaction(), true);
+							issueFacade.releaseLock(iroAppObj);							
+						}else{
 							iroUpdObj.getAttribute(IIssueAttributeType.ATTR_PLANNEDENDDATE).setRawValue(lastDateList);
-							issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);						
-							issueFacade.releaseLock(iroUpdObj.getVersionData().getHeadOVID());
-							
-						break;	
-						
+							issueFacade.save(iroUpdObj, this.getDefaultTransaction(), true);
+							issueFacade.releaseLock(iroOVID);
+						}														
+						break;							
 					}
 			
 				}
@@ -196,9 +171,12 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 		
 	}
 	
-	private List<CustomIssueObj> getIssuesFromIRO(String viewName, Map<String,Object> filterMap){
+	//private List<CustomIssueObj> getIssuesFromIRO(String viewName, Map<String,Object> filterMap){
+	private Map<String, Object> getIssuesFromIRO(String viewName, Map<String,Object> filterMap){
 		
 		List<CustomIssueObj> retList = new ArrayList<CustomIssueObj>();
+		Map<String, Object> retMap = new HashMap<String, Object>();
+		 int number = 0;
 		
 		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), viewName, filterMap, null,
 				true, this.getDefaultTransaction());
@@ -206,7 +184,7 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 			
 			List<CustomIssueObj> listObj = new ArrayList<CustomIssueObj>();
 			Iterator itQuery = query.getResultIterator();
-			 
+
 			while(itQuery.hasNext()){
 				
 				CustomIssueObj cstIssueObj = new CustomIssueObj();
@@ -216,10 +194,8 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 				
 				cstIssueObj.setObjDate(objDate);
 				cstIssueObj.setObjId(objId);
-				
-				
-				listObj.add(cstIssueObj);
-				
+				number += 1;				
+				listObj.add(cstIssueObj);		
 				
 			}
 			
@@ -238,7 +214,11 @@ public class CustomIssueSaveActionCommand extends IssueSaveActionCommand  {
 			query.release();
 		}
 		
-		return (List<CustomIssueObj>)retList;
+		retMap.put("list", retList);
+		retMap.put("qtd", number);
+		
+		return retMap;
+		
 		
 	}
 	

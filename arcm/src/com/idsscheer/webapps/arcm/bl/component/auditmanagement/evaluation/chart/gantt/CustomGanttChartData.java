@@ -30,6 +30,8 @@ import com.idsscheer.webapps.arcm.config.metadata.objecttypes.IObjectType;
 import com.idsscheer.webapps.arcm.config.metadata.objecttypes.IStringAttributeType;
 import com.idsscheer.webapps.arcm.config.metadata.objecttypes.StringAttributeType;
 import com.idsscheer.webapps.arcm.config.metadata.tree.INodeType;
+import com.sun.org.apache.xpath.internal.axes.NodeSequence;
+
 import org.apache.commons.lang.time.DateUtils;
 
 import java.util.ArrayList;
@@ -152,19 +154,26 @@ class CustomGanttChartData {
         List<IClientTreeNode> nodes = gatherer.getNodes();
         // do not root twice
         nodes.remove(root);
-        int i = 1;
+       
         for (IClientTreeNode node : nodes) {
-        	
-        	if (i >1){
-        		break;
-        	}else{
-        		i += 1;
-        	}
+
             long id = node.getModel().getValue(ITreeNodeModel.OBJECT_ID).getId();
             if (auditObj.getObjectId() != id) {
+            
             	
+            	if (this.getRoot().getId().equals(node.getParent().getId())) {
+            		CustomActivityData data = new CustomActivityData(node, node.getParent(), locale);
+            		if (isInDateRange(data, plannedStartDate, plannedEndDate)) {
+            			activities.add(data); 
+            			activityMap.put(id, data);
+            		}
+            	}
+         
+            	/*Código comentado em 07/05/2017 ****( INICIO )***   */
+  /*    
             	if (rootData.getObjectType().equals("AUDIT") || rootData.getObjectType().equals("AUDITTEMPLATE")) {
             		if (node.getParent().getNodeType().getName().equals("AUDITSTEP") || node.getParent().getNodeType().getName().equals("AUDITSTEPTEMPLATE")) {
+
             			// do nothing, will only show first lvl of audit step
             		} else {
             			CustomActivityData data = new CustomActivityData(node, node.getParent(), locale);
@@ -179,10 +188,13 @@ class CustomGanttChartData {
 		               activities.add(data); 
 		               activityMap.put(id, data);
 		            }
-
             }
+ 	*/
+            	/*Código comentado em 07/05/2017 ****( FIM )***   */ 	            	
             	
             }
+            	
+            	
         }
     }
     

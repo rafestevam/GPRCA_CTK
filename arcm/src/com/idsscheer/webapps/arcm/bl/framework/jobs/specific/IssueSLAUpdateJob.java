@@ -65,11 +65,11 @@ public class IssueSLAUpdateJob extends BaseJob {
 
 				Date actualDate = new Date();
 						
-				Calendar calAux = Calendar.getInstance();
+				/*Calendar calAux = Calendar.getInstance();
 				calAux.setTime(actualDate);
 				calAux.add(Calendar.DATE, 16);
 				actualDate = calAux.getTime();
-				this.displayLog("actualDate - " + actualDate.toString() );
+				this.displayLog("actualDate - " + actualDate.toString() );*/
 				
 				IAppObj iroUpdObj = facade.load(iroOVID, true);
 				this.displayLog("iroUpdObj - " + iroUpdObj.toString());

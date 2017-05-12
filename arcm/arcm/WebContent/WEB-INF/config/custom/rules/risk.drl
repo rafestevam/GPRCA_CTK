@@ -336,3 +336,58 @@ rule "GRC98_set_ra_result_visible[I,V]"
 		set "startdate"             not_mandatory
 		
 end
+
+rule "custom_userroles_readonly[I,V]"
+
+    salience 8900
+    no-loop true
+
+	when
+		user has in_general role "riskowner" OR
+		user has in_general role "controlexecutionowner" OR
+		user has in_general role "tester"
+
+	then
+		set "control_period"           readonly
+		set "duration"                 readonly
+		set "enddate"                  readonly
+		set "frequency"                readonly
+		set "control_period_offset"    readonly
+		set "owner_group"              readonly
+		set "reviewer_group"           readonly
+		set "startdate"                readonly
+		set "appsystem"                readonly
+		set "assertions"               readonly
+		set "assessment_activities"    invisible
+		set "controls"                 readonly
+		set "currency"                 readonly
+		set "description"              readonly
+		set "documents"                readonly
+		set "event_driven_allowed"     readonly
+		set "finaccount"               readonly
+		set "impact"                   readonly
+		set "manager_group"            readonly
+		set "name"                     readonly
+		set "notification_to"          readonly
+		set "orgunit"                  readonly
+		set "probability"              readonly
+		set "risk_catalog1"            readonly
+		set "risk_catalog2"            readonly
+		set "risk_category"            readonly
+		set "process"                  readonly
+		set "risk_id"                  readonly
+		set "risk_management_relevant" readonly
+		set "risktype"                 readonly
+		set "th_exp_avg_loss"          readonly
+		set "th_exp_max_loss"          readonly
+		set "th_exp_min_loss"          readonly
+		set "th_red_exp_avg_loss"      readonly
+		set "th_red_exp_max_loss"      readonly
+		set "th_red_exp_min_loss"      readonly
+		set "th_impact_score"          readonly
+		set "th_red_impact_score"      readonly
+		set "rm_notifications_qualitative"         readonly
+		set "rm_notifications_quantitative"        readonly
+		set "categderisco"                         readonly
+
+end

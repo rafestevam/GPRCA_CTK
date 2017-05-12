@@ -32,12 +32,14 @@
     
     <!-- Redefinição das Classificações de Controle -->
     <enum id="custom_controltype" isMultiple="false" type="Number">
+    	<enumitem id="all" value="-1" extendedMeaning="all" filterRelevant="true"/>
         <enumitem id="preventive" value="6"/>
         <enumitem id="detective" value="7"/>
     </enum>    
     
     <!-- Redefinição dos Tipos de Controle -->
 	<enum id="custom_controlexecution" isMultiple="false" type="Number">
+		<enumitem id="all" value="-1" extendedMeaning="all" filterRelevant="true"/>
         <enumitem id="manual" value="1"/>
         <enumitem id="it" value="2"/>
         <enumitem id="automatic" value="3"/>

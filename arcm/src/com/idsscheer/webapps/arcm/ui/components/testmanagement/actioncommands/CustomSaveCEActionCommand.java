@@ -3,24 +3,36 @@ package com.idsscheer.webapps.arcm.ui.components.testmanagement.actioncommands;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import javax.swing.Icon;
-
 import org.apache.log4j.Logger;
+import org.apache.openejb.terracotta.quartz.wrappers.JobFacade;
 
+import com.idsscheer.webapps.arcm.bl.authentication.context.IUserContext;
+import com.idsscheer.webapps.arcm.bl.authorization.rights.config.RoleConfigFacade;
+import com.idsscheer.webapps.arcm.bl.authorization.rights.runtime.accesscontrol.AccessRightController;
+import com.idsscheer.webapps.arcm.bl.authorization.rights.runtime.accesscontrol.standard.UsergroupAccessControl;
+import com.idsscheer.webapps.arcm.bl.authorization.rights.runtime.userrole.UserRoleFacade;
+import com.idsscheer.webapps.arcm.bl.authorization.rights.support.RoleUtility;
+import com.idsscheer.webapps.arcm.bl.authorization.rights.support.UserRoleUtility;
 import com.idsscheer.webapps.arcm.bl.dataaccess.query.IViewQuery;
 import com.idsscheer.webapps.arcm.bl.dataaccess.query.QueryFactory;
+import com.idsscheer.webapps.arcm.bl.framework.jobs.BaseJob;
+import com.idsscheer.webapps.arcm.bl.framework.jobs.JobHelper;
+import com.idsscheer.webapps.arcm.bl.models.form.IRoleSelectionModel;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObjFacade;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IViewObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IEnumAttribute;
+import com.idsscheer.webapps.arcm.bl.models.objectmodel.impl.TransactionManager;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjIterator;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjQuery;
+import com.idsscheer.webapps.arcm.bl.navigation.stack.IBreadcrumb;
+import com.idsscheer.webapps.arcm.bl.navigation.stack.IFormBreadcrumb;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlAttributeTypeCustom;
@@ -32,8 +44,12 @@ import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
 import com.idsscheer.webapps.arcm.common.util.ovid.OVIDFactory;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
+import com.idsscheer.webapps.arcm.config.metadata.rights.roles.IRole;
+import com.idsscheer.webapps.arcm.config.metadata.rights.roles.Role;
 import com.idsscheer.webapps.arcm.services.framework.batchserver.services.lockservice.LockType;
 import com.idsscheer.webapps.arcm.ui.framework.actioncommands.object.BaseSaveActionCommand;
+import com.idsscheer.webapps.arcm.ui.framework.common.JobUIEnvironment;
+import com.idsscheer.webapps.arcm.ui.framework.common.UIEnvironmentManager;
 
 public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 	
@@ -55,7 +71,12 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 	protected void afterExecute(){
 		
 		try{
-		
+			
+			/*IBreadcrumb peek = UIEnvironmentManager.get().getBreadcrumbStack().peek();
+			IRoleSelectionModel roleSelModel = ((IFormBreadcrumb)peek).getModel().getRoleSelectionModel();
+			
+			roleSelModel.getDefaultRole();*/
+			
 			IAppObj currAppObj = this.formModel.getAppObj();
 			//IAppObj currParentCtrlObj = this.parentControl(currAppObj);
 			long parentControlObjId = this.parentControl(currAppObj.getObjectId());
@@ -580,7 +601,7 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 		IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
 		IOVID ovid = null;
 		try{
-		
+			
 			Iterator itControl = controlList.iterator();
 			while(itControl.hasNext()){
 				
@@ -588,7 +609,7 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 				IOVID controlOVID = controlObj.getVersionData().getHeadOVID();
 				ovid = controlOVID;
 				IAppObj controlUpdObj = controlFacade.load(controlOVID, true);
-				controlFacade.allocateLock(controlOVID, LockType.FORCEWRITE);
+				controlFacade.allocateLock(controlOVID, LockType.TYPEDFORCEWRITE);
 				
 				if(this.currStatus.equals("ineffective")){
 					controlUpdObj.getAttribute(IControlAttributeTypeCustom.ATTR_CUSTOM_STATUS).setRawValue("ineficaz");

@@ -95,3 +95,25 @@ rule "control_export_relevant_editable_[I,V]"
 		set "control_effect"          invisible
 end
 
+rule "custom_userroles_readonly[I,V]"
+
+	salience 8900
+	when
+		user has in_general role "controlexecutionowner"
+
+	then
+		set "control_effect"      readonly
+		set "control_execution"   readonly
+		set "control_frequency"   readonly
+		set "control_id"          readonly
+		set "control_objective"   readonly
+		set "control_type"        readonly
+		set "controls"            readonly
+		set "key_control"         readonly
+		set "manager_group"       readonly
+		set "name"                readonly
+		set "testdefinitions"     readonly
+		set "controlexecutiontasks"     readonly
+		set "custom_status_control"     readonly
+
+end

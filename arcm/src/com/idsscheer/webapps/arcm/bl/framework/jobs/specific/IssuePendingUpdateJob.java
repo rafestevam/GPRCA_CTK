@@ -87,11 +87,11 @@ public class IssuePendingUpdateJob extends BaseJob {
 				logger.info(this.getClass().getName(), "created UpdObj - " + String.valueOf(iroUpdObj.getObjectId()));
 				Date actualDate = new Date();
 				
-				// Trecho para gerar datas de sistemas futuras para teste. Acrescenta 2 dias.
+				/*// Trecho para gerar datas de sistemas futuras para teste. Acrescenta 2 dias.
 				Calendar calAux = Calendar.getInstance();
 				calAux.setTime(actualDate);
 				calAux.add(Calendar.DATE, 2);
-				actualDate = calAux.getTime();
+				actualDate = calAux.getTime();*/
 				
 				logger.info(this.getClass().getName(), "created actual date - " + actualDate.toString());
 				

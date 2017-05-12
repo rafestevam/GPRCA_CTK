@@ -325,7 +325,7 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 					log.info("Total Testes 2a Linha: " + String.valueOf(cntTotal2Line));
 					log.info("Total Testes 3a Linha: " + String.valueOf(cntTotal3Line));
 					
-					List<IAppObj> tstCaseList = this.getTestCaseFromTestDef(tstDefObj);
+					List<IAppObj> tstCaseList = this.getTestCaseFromTestDef(tstDefObj.getObjectId());
 					for(IAppObj tstCaseObj : tstCaseList){
 						
 						IEnumAttribute ownerStatusAttr = tstCaseObj.getAttribute(ITestcaseAttributeType.ATTR_OWNER_STATUS);
@@ -493,7 +493,7 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		
 	}
 	
-private void controlClassification(List<IAppObj> controlList) throws Exception{
+	private void controlClassification(List<IAppObj> controlList) throws Exception{
 		
 		IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.CONTROL);
 		IOVID ovid = null;

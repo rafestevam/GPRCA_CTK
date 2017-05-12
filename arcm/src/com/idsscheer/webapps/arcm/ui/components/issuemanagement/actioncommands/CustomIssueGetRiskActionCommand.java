@@ -50,6 +50,7 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 		List<IAppObj> iroElements = iroList.getElements(this.getUserContext());		
 		Iterator<IAppObj> iroIterator = iroElements.iterator();				
 		IAppObjFacade testFacade = this.environment.getAppObjFacade(ObjectType.TESTCASE);			
+		//IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.TESTCASE);
 		IEnumAttribute issueTypeList = issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_ACTIONTYPE);
 		IEnumerationItem issueType = ARCMCollections.extractSingleEntry(issueTypeList.getRawValue(),true);
 		
@@ -63,31 +64,32 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 					
 					IAppObj iroAppObj = iroIterator.next();
 					IOVID iroOVID = iroAppObj.getVersionData().getHeadOVID();
-					IAppObj iroLstObj = testFacade.load(iroOVID, true);					
-									
-					
+					IAppObj iroLstObj = testFacade.load(iroOVID, true);		
+										
 					if(!iroAppObj.getObjectType().equals(ObjectType.TESTCASE))
 						continue;
+										
+					testFacade.allocateWriteLock(iroLstObj.getVersionData().getHeadOVID());
 					
+					List<IAppObj> LstcontrolObj = iroLstObj.getAttribute( ITestcaseAttributeType.LIST_CONTROL).getElements(this.getUserContext());
 					
-					testFacade.allocateWriteLock(iroLstObj.getVersionData().getHeadOVID());								
+					for(IAppObj controlObj: LstcontrolObj) {
+						
+						String ssubpro = controlObj.getAttribute(IHierarchyAttributeType.ATTR_NAME).getRawValue();
+						
+					}
 									
 					List<IAppObj> LstprocObj = iroLstObj.getAttribute(ITestcaseAttributeType.LIST_PROCESS).getElements(this.getUserContext());				
 										
 					for(IAppObj pcObj : LstprocObj ){
 					
-						String sprocess = pcObj.getAttribute(IHierarchyAttributeType.ATTR_NAME ).getRawValue();
-						this.displayLog("SubProcesso : " + pcObj.getAttribute(IHierarchyAttributeType.ATTR_NAME ).getRawValue());
-						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PROCESS).setRawValue(sprocess);
-						
-						String smodelname = pcObj.getAttribute(IHierarchyAttributeType.ATTR_MODEL_NAME).getRawValue();
-						this.displayLog("Processo:"+ smodelname );				
-						
-						
-						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_MODELNAME).setRawValue(smodelname);
-						this.displayLog("Objeto relevan: " + String.valueOf(pcObj.getAttribute(IHierarchyAttributeType.ATTR_MODEL_NAME )));	
-					}
+						String  smodelname = pcObj.getAttribute(IHierarchyAttributeType.ATTR_NAME ).getRawValue();
+						String  sprocess = pcObj.getAttribute(IHierarchyAttributeType.ATTR_MODEL_NAME).getRawValue();
+						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_MODELNAME).setRawValue( smodelname);
+						//issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PROCESS).setRawValue(sprocess);
+						issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_CST_PROCESS).setRawValue( smodelname);
 					
+					}					
 										
 					List<IAppObj> riskObj = iroLstObj.getAttribute(ITestcaseAttributeType.LIST_RISK).getElements(this.getUserContext());
 										

@@ -147,6 +147,7 @@
         <!-- GAP GRC14 - Novo template de mensagem -->
         <enumitem id="controlexecution_created" value="5000" />
         <enumitem id="riskowner_notification" value="5001" />
+        <enumitem id="ceowner_notification" value="5002" />
         <!-- / GAP GRC14 -->
         
     </enum>

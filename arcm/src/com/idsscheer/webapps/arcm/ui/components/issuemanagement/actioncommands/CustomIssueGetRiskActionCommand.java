@@ -13,10 +13,12 @@ import com.idsscheer.webapps.arcm.bl.models.objectmodel.IAppObjFacade;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.IViewObj;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IEnumAttribute;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.attribute.IListAttribute;
+import com.idsscheer.webapps.arcm.bl.models.objectmodel.impl.FacadeFactory;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IHierarchyAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssueAttributeTypeCustom;
+import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IIssuerelevantobjectAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITestcaseAttributeType;
 import com.idsscheer.webapps.arcm.common.notification.NotificationTypeEnum;
@@ -49,8 +51,9 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 		//List<IAppObj> iroElements = iroList.getElements(this.getUserContext());
 		List<IAppObj> iroElements = iroList.getElements(this.getUserContext());		
 		Iterator<IAppObj> iroIterator = iroElements.iterator();				
-		IAppObjFacade testFacade = this.environment.getAppObjFacade(ObjectType.TESTCASE);			
+		//IAppObjFacade testFacade = this.environment.getAppObjFacade(ObjectType.TESTCASE);			
 		//IAppObjFacade controlFacade = this.environment.getAppObjFacade(ObjectType.TESTCASE);
+		IAppObjFacade facade = null;
 		IEnumAttribute issueTypeList = issueAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_ACTIONTYPE);
 		IEnumerationItem issueType = ARCMCollections.extractSingleEntry(issueTypeList.getRawValue(),true);
 		
@@ -64,13 +67,20 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 					
 					IAppObj iroAppObj = iroIterator.next();
 					IOVID iroOVID = iroAppObj.getVersionData().getHeadOVID();
-					IAppObj iroLstObj = testFacade.load(iroOVID, true);		
+					//IAppObj iroLstObj = testFacade.load(iroOVID, true);		
 										
-					if(!iroAppObj.getObjectType().equals(ObjectType.TESTCASE))
-						continue;
-										
-					testFacade.allocateWriteLock(iroLstObj.getVersionData().getHeadOVID());
+					if(!iroAppObj.getObjectType().equals(ObjectType.TESTCASE)){
+						if(!iroAppObj.getObjectType().equals(ObjectType.CONTROLEXECUTION)){
+							continue;
+						}
+					}
 					
+					facade = FacadeFactory.getInstance().getAppObjFacade(this.getFullGrantUserContext(), iroAppObj.getObjectType());
+					IAppObj iroLstObj = facade.load(iroOVID, true);
+					
+					//testFacade.allocateWriteLock(iroLstObj.getVersionData().getHeadOVID());
+					facade.allocateWriteLock(iroOVID);
+
 					List<IAppObj> LstcontrolObj = iroLstObj.getAttribute( ITestcaseAttributeType.LIST_CONTROL).getElements(this.getUserContext());
 					
 					for(IAppObj controlObj: LstcontrolObj) {
@@ -141,11 +151,14 @@ public class CustomIssueGetRiskActionCommand extends IssueCacheActionCommand{
 						
 						IAppObj iroAppObj = iroIterator.next();
 						IOVID iroOVID = iroAppObj.getVersionData().getHeadOVID();
-						IAppObj iroLstObj = testFacade.load(iroOVID, true);
+						//IAppObj iroLstObj = testFacade.load(iroOVID, true);
 						
 						
 						if(!iroAppObj.getObjectType().equals(ObjectType.ISSUE))
 							continue;
+						
+						facade = FacadeFactory.getInstance().getAppObjFacade(this.getFullGrantUserContext(), iroAppObj.getObjectType());
+						IAppObj iroLstObj = facade.load(iroOVID, true);
 						
 						String sresult = iroAppObj.getAttribute(IIssueAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
 						this.displayLog("Resultado:" + sresult);

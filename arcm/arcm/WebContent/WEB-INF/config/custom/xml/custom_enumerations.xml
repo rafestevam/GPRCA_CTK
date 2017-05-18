@@ -17,16 +17,17 @@
         <enumitem id="all" value="-1" extendedMeaning="all"/>
         <enumitem id="unspecified" value="0" extendedMeaning="please_select" filterRelevant="false"/>
         <enumitem id="daily" value="1"/>
-        <enumitem id="monthly" value="3"/>
-        <enumitem id="quarterly" value="4"/>
-        <enumitem id="semiannually" value="5"/>
-        <enumitem id="annually" value="6"/>
-        <enumitem id="severally" value="8"/>
-        <enumitem id="eventually" value="9"/>
+        <enumitem id="severally" value="2"/>
+        <enumitem id="weekly" value="3"/>
+        <enumitem id="monthly" value="4"/>
+        <enumitem id="quarterly" value="5"/>
+        <enumitem id="semiannually" value="6"/>
+        <enumitem id="annually" value="7"/>
+        <enumitem id="eventdriven" value="8"/>
         <!--
         <enumitem id="weekly" value="2"/>
         <enumitem id="semiannually" value="5"/>
-        <enumitem id="eventdriven" value="7"/>
+        <enumitem id="eventually" value="9"/>
         -->
     </enum>
     
@@ -87,8 +88,8 @@
     
     <!-- Inicio GAP GRC98 -->
     <enum id="custom_controlexecstatus" isMultiple="false" type="Number">
-    	<enumitem id="effective" value="1" />
-    	<enumitem id="ineffective" value="2" />
+    	<enumitem id="effective" value="1" image="iconlib/icons/states/state_effective_16.png"/>
+    	<enumitem id="ineffective" value="2" image="iconlib/icons/states/state_noneffective_16.png"/>
     </enum>
     <!-- Fim GAP GRC98 -->
     
@@ -427,6 +428,10 @@
         <!-- GRC14 -->
         <enumitem id="RADelayMailJob" value="51">
         	<parameter name="ClassName" value="com.idsscheer.webapps.arcm.bl.framework.jobs.specific.RADelayMailJob"/>
+        </enumitem>
+        
+        <enumitem id="CEDelayMailJob" value="52">
+        	<parameter name="ClassName" value="com.idsscheer.webapps.arcm.bl.framework.jobs.specific.CEDelayMailJob"/>
         </enumitem>
         <!-- /GRC14 -->
         

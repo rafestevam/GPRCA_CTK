@@ -41,6 +41,7 @@ import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlex
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.util.ARCMCollections;
+import com.idsscheer.webapps.arcm.common.util.StringUtility;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
 import com.idsscheer.webapps.arcm.common.util.ovid.OVIDFactory;
 import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
@@ -102,7 +103,11 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 			//IAppObj riskParentObj = this.getRiskFromControl(currParentCtrlObj);
 			IAppObj riskParentObj = this.getRiskFromControl(parentControlObjId);
 			log.info("risk parent obj: " + riskParentObj.toString());
-			this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
+			if(riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).isEmpty()){
+				this.riscoPotencial = "Nao Avaliado";
+			}else{
+				this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
+			}
 			
 			if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).isEmpty())
 				this.control2line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).getRawValue();
@@ -309,6 +314,8 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 		/*if(this.currStatus.equals("ineffective"))
 			count1line += 1;*/
 		
+		String riskResidualFinal = "";
+		
 		try{
 			
 			IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
@@ -434,8 +441,10 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 			log.info("Amb. Controle Final: " + riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROLFINAL).getRawValue());
 			log.info("Risco Potencial: " + this.riscoPotencial);
 			
-			String riskResidualFinal = this.riskResidualFinal(this.riscoPotencial, riskClassFinal);
-			riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESIDUALFINAL).setRawValue(riskResidualFinal);
+			if(!this.riscoPotencial.equals("Nao Avaliado")){
+				riskResidualFinal = this.riskResidualFinal(this.riscoPotencial, riskClassFinal);
+				riskUpdObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESIDUALFINAL).setRawValue(riskResidualFinal);
+			}
 			
 			riskFacade.save(riskUpdObj, this.getDefaultTransaction(), true);
 			riskFacade.releaseLock(riskOVID);

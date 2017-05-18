@@ -1,8 +1,10 @@
 package ISSUE_RuleSet
-expander issue.dsl
+expander custom_issue.dsl
+#expander issue.dsl
 
 import com.idsscheer.webapps.arcm.bl.re.ext.CollectiveHelper;
 import com.idsscheer.webapps.arcm.bl.component.issuemanagement.re.IssueHelper;
+import com.idsscheer.webapps.arcm.bl.component.issuemanagement.re.IssueHelperCustom;
 
 # OBJECT        client_objid         LONG       Client ID                                                                                                                                                   
 # OBJECT        client_sign          CLIENTSIGN Client                                                                                                                                                      
@@ -1015,4 +1017,17 @@ rule "custom_set_issuesource[I,V]"
 		set "issuesource"       editable
 		set "priority"          invisible
 		set "category"          invisible
+end
+
+rule "custom_set_riskclassification[I,V]"
+
+	salience 85
+	no-loop true
+	
+	when
+		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "issue"
+	
+	then
+		set risk classification
+
 end

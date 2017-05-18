@@ -33,8 +33,9 @@
                 </row>
                 
                  <row id="acting_front">
-                    <element attribute.idref="acting_front">  
-                    <javaScriptEvent expression="aam_objectcommand('customissuegetrisk')" name="onChange"/>
+                    <element attribute.idref="acting_front">
+                    <javaScriptEvent expression="aam_objectcommand('cache')" name="onChange"/>
+<!--                     <javaScriptEvent expression="aam_objectcommand('customissuegetrisk')" name="onChange"/> -->
                     <!-- <javaScriptEvent expression="aam_objectcommand('customissueyear')" name="onChange"/> --> 
                      </element>                
                 </row>          

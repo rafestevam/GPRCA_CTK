@@ -49,6 +49,7 @@ import com.idsscheer.webapps.arcm.common.constants.metadata.EnumerationsCustom;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IClientAttributeType;
+import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlexecutionAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IObjectAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskassessmentAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.ITransactionalAttributeType;
@@ -69,12 +70,12 @@ import com.idsscheer.webapps.arcm.services.framework.batchserver.services.jobs.J
 import com.idsscheer.webapps.arcm.services.umc.IUMCFacade;
 
 @CanBeScheduled
-public class RADelayMailJob extends BaseJob {
+public class CEDelayMailJob extends BaseJob {
 //	public static final String KEY_JOB_NAME = EnumerationsCustom.CUSTOM_JOBS.ISSUE_PENDING.getPropertyKey();
-	public static final String KEY_JOB_NAME = "enumeration.RADelayMailJob.DBI";
+	public static final String KEY_JOB_NAME = "enumeration.CEDelayMailJob.DBI";
 	private static final com.idsscheer.batchserver.logging.Logger logger = new com.idsscheer.batchserver.logging.Logger();
 
-	public RADelayMailJob(IOVID executingUser, Locale executingLocale) {
+	public CEDelayMailJob(IOVID executingUser, Locale executingLocale) {
 		super(executingUser, executingLocale);
 	}
 
@@ -83,18 +84,18 @@ public class RADelayMailJob extends BaseJob {
 		
 		try{
 
-			List<IAppObj> raDelayList = this.getRAforNote();
+			List<IAppObj> ceDelayList = this.getCEforNote();
 			ITransaction transaction = TransactionManager.getInstance().createTransaction();
 			
-			for(int i = 0; i < raDelayList.size(); i++){
-				IAppObj raDelayObj = raDelayList.get(i);
+			for(int i = 0; i < ceDelayList.size(); i++){
+				IAppObj ceDelayObj = ceDelayList.get(i);
 				
 				Map<String, Object> param = new HashMap<String, Object>();
 				
-				param.put("template", "riskowner_notification");
+				param.put("template", "ceowner_notification");
 				param.put("to", "owner_group");
 								
-				ChainContext cc = new ChainContext(raDelayObj, this.jobContext.getUserContext());
+				ChainContext cc = new ChainContext(ceDelayObj, this.jobContext.getUserContext());
 				cc.setTransaction(transaction);
 				CommandContext commandContext = new CommandContext(cc, (HashMap)param);
 				SendMailCommand command = new SendMailCommand();
@@ -125,9 +126,9 @@ public class RADelayMailJob extends BaseJob {
 	protected void deallocateResources() {
 	}
 	
-	private List<IAppObj> getRAforNote() throws Exception{
+	private List<IAppObj> getCEforNote() throws Exception{
 		
-		List<IAppObj> raListRet = new ArrayList<IAppObj>();
+		List<IAppObj> ceListRet = new ArrayList<IAppObj>();
 		IAppObjFacade facade = null;
 		IAppObjQuery query = null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -139,7 +140,7 @@ public class RADelayMailJob extends BaseJob {
 		
 		try{
 			
-			facade = FacadeFactory.getInstance().getAppObjFacade(this.userContext, ObjectType.RISKASSESSMENT);
+			facade = FacadeFactory.getInstance().getAppObjFacade(this.userContext, ObjectType.CONTROLEXECUTION);
 			query = facade.createQuery();
 			
 			//query.addRestriction(QueryRestriction.eq(IRiskassessmentAttributeType.ATTR_PLANNEDENDDATE, this.getDelayData(calendar.getTime())));
@@ -149,19 +150,19 @@ public class RADelayMailJob extends BaseJob {
 			IAppObjIterator itQuery = query.getResultIterator();
 			while(itQuery.hasNext()){
 				
-				IAppObj raAppObj = itQuery.next();
+				IAppObj ceAppObj = itQuery.next();
 				
-				Date expireDate = raAppObj.getAttribute(IRiskassessmentAttributeType.ATTR_PLANNEDENDDATE).getRawValue();
+				Date expireDate = ceAppObj.getAttribute(IControlexecutionAttributeType.ATTR_PLANNEDENDDATE).getRawValue();
 				//if(!expireDate.equals(calendar.getTime()))
 				if(!dateFormat.format(expireDate).equals(dateFormat.format(delayDate)))
 					continue;
 				
-				IEnumAttribute ownerStatusAttr = raAppObj.getAttribute(IRiskassessmentAttributeType.ATTR_OWNER_STATUS);
+				IEnumAttribute ownerStatusAttr = ceAppObj.getAttribute(IControlexecutionAttributeType.ATTR_OWNER_STATUS);
 				IEnumerationItem ownerStatus = ARCMCollections.extractSingleEntry(ownerStatusAttr.getRawValue(), true);
 				if(ownerStatus.getValue().equals("3"))
 					continue;
 				
-				raListRet.add(raAppObj);
+				ceListRet.add(ceAppObj);
 				
 			}
 			
@@ -172,7 +173,7 @@ public class RADelayMailJob extends BaseJob {
 			query.release();
 		}
 		
-		return (List<IAppObj>)raListRet;
+		return (List<IAppObj>)ceListRet;
 		
 	}
 	

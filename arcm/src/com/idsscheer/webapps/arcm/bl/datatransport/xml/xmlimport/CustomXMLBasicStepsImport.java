@@ -1,8 +1,10 @@
 package com.idsscheer.webapps.arcm.bl.datatransport.xml.xmlimport;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import com.idsscheer.webapps.arcm.bl.authentication.context.ContextFactory;
@@ -16,9 +18,11 @@ import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjIterator;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.IAppObjQuery;
 import com.idsscheer.webapps.arcm.bl.models.objectmodel.query.QueryRestriction;
 import com.idsscheer.webapps.arcm.common.constants.metadata.ObjectType;
+import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IControlAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeType;
 import com.idsscheer.webapps.arcm.common.constants.metadata.attribute.IRiskAttributeTypeCustom;
 import com.idsscheer.webapps.arcm.common.util.ovid.IOVID;
+import com.idsscheer.webapps.arcm.config.metadata.enumerations.IEnumerationItem;
 import com.idsscheer.webapps.arcm.dl.framework.IDataLayerObject;
 import com.idsscheer.webapps.arcm.dl.migframe.IMerge;
 import com.idsscheer.webapps.arcm.dl.migframe.IMigrationRecord;

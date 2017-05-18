@@ -86,6 +86,11 @@
                         <javaScriptEvent expression="aam_objectcommand('cache');" name="onChange"/>
                     </element>
                 </row>
+                <row id="custom_controlexecstatus"> 
+                	<element attribute.idref="custom_controlexecstatus">
+                		<javaScriptEvent expression="aam_objectcommand('cache');" name="onChange"/>
+                	</element>
+                </row>
                 <row id="due_status">
                     <element attribute.idref="due_status"/>
                 </row>
@@ -112,11 +117,11 @@
                     </element>
                 </row>
                 -->
-                <row id="custom_controlexecstatus"> 
-                	<element attribute.idref="custom_controlexecstatus">
-                		<javaScriptEvent expression="aam_objectcommand('cache');" name="onChange"/>
-                	</element>
-                </row>
+<!--                 <row id="custom_controlexecstatus">  -->
+<!--                 	<element attribute.idref="custom_controlexecstatus"> -->
+<!--                 		<javaScriptEvent expression="aam_objectcommand('cache');" name="onChange"/> -->
+<!--                 	</element> -->
+<!--                 </row> -->
                 <!-- Fim GAP GRC98 -->
             </rowGroup>
         </page>

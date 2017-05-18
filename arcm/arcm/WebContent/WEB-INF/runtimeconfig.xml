@@ -160,13 +160,13 @@
                 true -> when an object date is not equal, arcm objects where overwriten by the import
                 false-> importdata where ignored when the arcm object is younger than the import object
             -->
-            <parameter name="forceImport" value="false"/>
+            <parameter name="forceImport" value="true"/>
 
             <!--
                        true -> fills attribute with the default value if the attribute is not set from the aris import file
                        false -> don't use default values in the aris import
                    -->
-            <parameter name="application.migration.framework.consider.default.values" value="false"/>
+            <parameter name="application.migration.framework.consider.default.values" value="true"/>
 
             <!--
                 Switch for XMLImport modus : ARIS only
@@ -174,7 +174,7 @@
                 false: only if an object is changed, it will be written a new version. To decide that, every attribute
                   of the object will be checked if the values are the same. If not, the object will be imported.
             -->
-            <parameter name="useARISChangeDate" value="false"/>
+            <parameter name="useARISChangeDate" value="true"/>
 
             <!-- specify the the name of the used tenant -->
             <parameter name="umc.tenant" value="default"/>
@@ -416,9 +416,18 @@
         <parameterList name="RADelayMailJob">
         	<parameter name="jobitem" value="RADelayMailJob"/>
         	<parameter name="startScheduler" value="true"/>
-        	<parameter name="executionTime" value="0 42 19 ? * SUN-SAT"/>
+        	<parameter name="executionTime" value="0 01 01 ? * SUN-SAT"/>
         	<parameter name="clientexcludinglist" value="" />
         	<parameter name="className" value="RADelayMailJob" />
+        	<parameter name="clientbased" value="false"/>
+        </parameterList>
+        
+        <parameterList name="CEDelayMailJob">
+        	<parameter name="jobitem" value="CEDelayMailJob"/>
+        	<parameter name="startScheduler" value="true"/>
+        	<parameter name="executionTime" value="0 36 15 ? * SUN-SAT"/>
+        	<parameter name="clientexcludinglist" value="" />
+        	<parameter name="className" value="CEDelayMailJob" />
         	<parameter name="clientbased" value="false"/>
         </parameterList>
         <!-- Fim GAP - GRC14 -->

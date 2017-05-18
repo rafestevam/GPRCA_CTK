@@ -41,6 +41,7 @@ public class CustomRuleGenerator4ARIS extends XMLImportMigrationRuleGenerator4AR
 			printColumnMap("setRAControl3Line", ObjectType.RISK.getId(), "ra_control3line", "ra_control3line");
 			printColumnMap("setRAControlFinal", ObjectType.RISK.getId(), "ra_controlfinal", "ra_controlfinal");
 		}
+		
 	}
 	
 	protected void printObjectAndVersionColumMaps(IDataLayerObjMetaData smd) {

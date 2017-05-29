@@ -102,23 +102,31 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 			//
 			//IAppObj riskParentObj = this.getRiskFromControl(currParentCtrlObj);
 			IAppObj riskParentObj = this.getRiskFromControl(parentControlObjId);
-			log.info("risk parent obj: " + riskParentObj.toString());
-			if(riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).isEmpty()){
-				this.riscoPotencial = "Nao Avaliado";
-			}else{
-				this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
-			}
+			//List<IAppObj>riskParentList = this.getRisksFromControl();
 			
-			if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).isEmpty())
-				this.control2line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).getRawValue();
+			//for(int i = 0; i < riskParentList.size(); i++){
+				
+				//IAppObj riskParentObj = riskParentList.get(i);
 			
-			if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).isEmpty())
-				this.control3line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).getRawValue();
+				log.info("risk parent obj: " + riskParentObj.toString());
+				if(riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).isEmpty()){
+					this.riscoPotencial = "Nao Avaliado";
+				}else{
+					this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
+				}
+				
+				if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).isEmpty())
+					this.control2line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL2LINE).getRawValue();
+				
+				if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).isEmpty())
+					this.control3line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL3LINE).getRawValue();
+				
+				if(this.ceControlExec.equals("3")){
+					this.controlClassification(currAppObj.getAttribute(IControlexecutionAttributeType.LIST_CONTROL).getElements(getUserContext()));
+					this.affectResidualRisk(riskParentObj);
+				}
 			
-			if(this.ceControlExec.equals("3")){
-				this.controlClassification(currAppObj.getAttribute(IControlexecutionAttributeType.LIST_CONTROL).getElements(getUserContext()));
-				this.affectResidualRisk(riskParentObj);
-			}
+			//}
 			
 			
 		}catch(Exception e){
@@ -301,6 +309,49 @@ public class CustomSaveCEActionCommand extends BaseSaveActionCommand {
 		}
 		
 		return riskAppObj;
+		
+	}
+	
+	private List<IAppObj> getRisksFromControl() throws Exception{
+		
+		//IAppObj riskAppObj = null;
+		List<IAppObj> riskAppList = new ArrayList<IAppObj>();
+		long riskID = 0;
+		long riskVersionNumber = 0;
+		
+		Map filterMap = new HashMap();
+		//filterMap.put("control_obj_id", controlObjID);
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "customcontrol2risk", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				riskID = (Long)viewObj.getRawValue("risk_obj_id");
+				riskVersionNumber = (Long)viewObj.getRawValue("risk_version_number");
+				
+				IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
+				IOVID riskOVID = OVIDFactory.getOVID(riskID, riskVersionNumber);
+				IAppObj riskAppObj = riskFacade.load(riskOVID, true);
+				
+				riskAppList.add(riskAppObj);
+				
+			}
+			
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}
+		
+		//return riskAppObj;
+		return (List<IAppObj>)riskAppList;
 		
 	}
 	

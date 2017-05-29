@@ -65,8 +65,9 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		try{
 		
 			IAppObj currAppObj = this.formModel.getAppObj();
-			//IAppObj currParentCtrlObj = this.parentControl(currAppObj);
-			long parentControlObjId = this.parentControl(currAppObj.getObjectId());
+			IAppObj currParentCtrlObj = this.parentControl(currAppObj);
+			String parentControlId = currParentCtrlObj.getAttribute(IControlAttributeType.ATTR_CONTROL_ID).getRawValue();
+			//long parentControlObjId = this.parentControl(currAppObj.getObjectId());
 			//String ownerStatus = this.requestContext.getParameter(ITestcaseAttributeType.STR_OWNER_STATUS);
 			//this.origemTeste = this.requestContext.getParameter(ITestCaseAttributeTypeCustom.STR_ORIGEMTESTE);
 			IEnumAttribute ownerStatusAttr = currAppObj.getAttribute(ITestcaseAttributeType.ATTR_OWNER_STATUS);
@@ -102,21 +103,30 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 			log.info("Status de Proprietário: " + ownerStatus);
 		
 			//IAppObj riskParentObj = this.getRiskFromControl(currParentCtrlObj);
-			IAppObj riskParentObj = this.getRiskFromControl(parentControlObjId);
-			if(riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).isEmpty()){
-				this.riscoPotencial = "Nao Avaliado";
-			}else{
-				this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
-			}
+			//IAppObj riskParentObj = this.getRiskFromControl(parentControlObjId);
 			
-			if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL1LINE).isEmpty())
-				this.riskClass1Line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL1LINE).getRawValue();
+			List<IAppObj> riskAppList = this.getRisksFromControl(parentControlId);
 			
-			log.info("Risco Pai: " + riskParentObj.getAttribute(IRiskAttributeType.ATTR_RISK_ID).getRawValue());
-			//if(ownerStatus.equals("3") || ownerStatus.equals("4"))
-			if(this.requestContext.getParameter(ITestcaseAttributeType.STR_REVIEWER_STATUS).equals("1")){
-				this.controlClassification(currAppObj.getAttribute(ITestcaseAttributeType.LIST_CONTROL).getElements(getUserContext()));
-				this.affectResidualRisk(riskParentObj);
+			for(int i = 0; i < riskAppList.size(); i++){
+				
+				IAppObj riskParentObj = riskAppList.get(i);
+			
+				if(riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).isEmpty()){
+					this.riscoPotencial = "Nao Avaliado";
+				}else{
+					this.riscoPotencial = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_RESULT).getRawValue();
+				}
+				
+				if(!riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL1LINE).isEmpty())
+					this.riskClass1Line = riskParentObj.getAttribute(IRiskAttributeTypeCustom.ATTR_RA_CONTROL1LINE).getRawValue();
+				
+				log.info("Risco Pai: " + riskParentObj.getAttribute(IRiskAttributeType.ATTR_RISK_ID).getRawValue());
+				//if(ownerStatus.equals("3") || ownerStatus.equals("4"))
+				if(this.requestContext.getParameter(ITestcaseAttributeType.STR_REVIEWER_STATUS).equals("1")){
+					this.controlClassification(currAppObj.getAttribute(ITestcaseAttributeType.LIST_CONTROL).getElements(getUserContext()));
+					this.affectResidualRisk(riskParentObj);
+				}
+			
 			}
 			
 			
@@ -287,6 +297,49 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		
 	}
 	
+	private List<IAppObj> getRisksFromControl(String controlID) throws Exception{
+		
+		//IAppObj riskAppObj = null;
+		List<IAppObj> riskAppList = new ArrayList<IAppObj>();
+		long riskID = 0;
+		long riskVersionNumber = 0;
+		
+		Map filterMap = new HashMap();
+		filterMap.put("control_id", controlID);
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "customcontrol2risk", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				riskID = (Long)viewObj.getRawValue("risk_obj_id");
+				riskVersionNumber = (Long)viewObj.getRawValue("risk_version_number");
+				
+				IAppObjFacade riskFacade = this.environment.getAppObjFacade(ObjectType.RISK);
+				IOVID riskOVID = OVIDFactory.getOVID(riskID, riskVersionNumber);
+				IAppObj riskAppObj = riskFacade.load(riskOVID, true);
+				
+				riskAppList.add(riskAppObj);
+				
+			}
+		
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}
+		
+		return (List<IAppObj>)riskAppList;
+		//return riskAppObj;
+		
+	}
+	
 	private void affectResidualRisk(IAppObj riskObj) throws Exception{
 		
 		double cntTotal2Line = 0;
@@ -310,7 +363,9 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 				IAppObj controlUpdObj = controlFacade.load(controlOVID, true);
 				controlFacade.allocateWriteLock(controlOVID);*/
 				
-				List<IAppObj> tstDefList = controlObj.getAttribute(IControlAttributeType.LIST_TESTDEFINITIONS).getElements(this.getFullGrantUserContext());
+				//List<IAppObj> tstDefList = controlObj.getAttribute(IControlAttributeType.LIST_TESTDEFINITIONS).getElements(this.getFullGrantUserContext());
+				String controlID = controlObj.getAttribute(IControlAttributeType.ATTR_CONTROL_ID).getRawValue();
+				List<IAppObj> tstDefList = this.getTestDefFromControl(controlID);
 				for(IAppObj tstDefObj : tstDefList){
 					
 					if(tstDefObj.getObjectId() == this.tdObjectId)
@@ -657,6 +712,46 @@ public class CustomTestcaseSaveActionCommand extends TestcaseSaveActionCommand {
 		return (List<IAppObj>) testCaseReturn;
 		
 	}
+	
+	private List<IAppObj> getTestDefFromControl(String controlID) throws Exception{
+		
+		List<IAppObj> testDefReturn = new ArrayList<IAppObj>();
+		
+		Map filterMap = new HashMap();
+		filterMap.put("control_id", controlID);
+		
+		IViewQuery query = QueryFactory.createQuery(this.getFullGrantUserContext(), "custom_control2testdef", filterMap, null,
+				true, this.getDefaultTransaction());
+		
+		try{
+		
+			Iterator itQuery = query.getResultIterator();
+			
+			while(itQuery.hasNext()){
+				
+				IViewObj viewObj = (IViewObj)itQuery.next();
+				long tdID = (Long)viewObj.getRawValue("testdefinition_obj_id");
+				long tdVersionNumber = (Long)viewObj.getRawValue("testdefinition_version_number");
+				
+				IAppObjFacade tdFacade = this.environment.getAppObjFacade(ObjectType.TESTDEFINITION);
+				IOVID tdOVID = OVIDFactory.getOVID(tdID, tdVersionNumber);
+				IAppObj tdAppObj = tdFacade.load(tdOVID, true);
+				
+				if(tdAppObj != null)
+					testDefReturn.add(tdAppObj);
+				
+			}
+			
+		}catch(Exception e){
+			query.release();
+			throw e;
+		}finally{
+			query.release();
+		}		
+		
+		return (List<IAppObj>) testDefReturn;
+		
+	}	
 	
 	private String riskClassification(double riskVuln){
 		

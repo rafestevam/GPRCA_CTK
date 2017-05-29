@@ -42,6 +42,11 @@ public class CustomRuleGenerator4ARIS extends XMLImportMigrationRuleGenerator4AR
 			printColumnMap("setRAControlFinal", ObjectType.RISK.getId(), "ra_controlfinal", "ra_controlfinal");
 		}
 		
+		if (smd.getDataLayerObjectType().getName().equalsIgnoreCase(ObjectType.CONTROL.getId())){
+			printColumnMap("setStatusControl", ObjectType.CONTROL.getId(), "custom_status_control", "custom_status_control");
+
+		}
+		
 	}
 	
 	protected void printObjectAndVersionColumMaps(IDataLayerObjMetaData smd) {

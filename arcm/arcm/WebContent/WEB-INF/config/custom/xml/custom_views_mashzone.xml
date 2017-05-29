@@ -304,8 +304,8 @@
             
             <!-- Customizing for Mashzone -->
             <viewColumn id="c_custom_status_control" attributeType="custom_status_control" mashzoneRelevant="true" isSelectColumn="true"/>
-	    <viewColumn id="c_version_number" attributeType="version_number" mashzoneRelevant="true" isSelectColumn="true"/>            
-	    <viewColumn id="c_change_date" attributeType="change_date" mashzoneRelevant="true" isSelectColumn="true"/>            
+	    	<viewColumn id="c_version_number" attributeType="version_number" mashzoneRelevant="true" isSelectColumn="true"/>            
+	    	<viewColumn id="c_change_date" attributeType="change_date" mashzoneRelevant="true" isSelectColumn="true"/>            
             <viewColumn id="c_control_type" attributeType="control_type" mashzoneRelevant="true" isSelectColumn="true"/>
             <viewColumn id="c_control_execution" attributeType="control_execution" mashzoneRelevant="true" isSelectColumn="true"/>
             <!-- Customizing for Mashzone -->
@@ -468,6 +468,7 @@
             <viewColumn id="td_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>
             <viewColumn id="testdef_version_active" attributeType="version_active" mashzoneRelevant="false"/>
             <viewColumn id="deactivated" attributeType="deactivated" mashzoneRelevant="false"/>
+            <viewColumn id="td_origemteste" attributeType="origemteste" isSelectColumn="true"/>
         </viewObject>
         <viewObject id="VO_testdef2testcase_testcase" objectType="TESTCASE">
             <viewColumn id="tc_id" attributeType="obj_id" isSortable="true" isSelectColumn="true"/>

@@ -98,6 +98,8 @@ end
 rule "custom_userroles_readonly[I,V]"
 
 	salience 8900
+	no-loop true
+	
 	when
 		user has in_general role "controlexecutionowner"
 
@@ -115,5 +117,31 @@ rule "custom_userroles_readonly[I,V]"
 		set "testdefinitions"     readonly
 		set "controlexecutiontasks"     readonly
 		set "custom_status_control"     readonly
+
+end
+
+rule "custom_userroles_readonly_man[I,V]"
+
+	salience 8800
+	no-loop true
+	
+	when
+		( user has in_general role "controlmanager" ) OR
+		( user has in_general role "riskmanager" )    OR
+		( user has in_general role "testmanager" )
+		
+	then
+		set "control_export_relevant"       readonly
+		set "control_id"                    readonly
+		set "name"                          readonly
+		set "control_objective"             readonly
+		set "key_control"                   readonly
+		set "control_type"                  readonly
+		set "manager_group"                 readonly
+		set "controls"                      readonly
+		set "control_frequency"             readonly
+		set "control_execution"             readonly
+		set "control_effect"                readonly
+		set "custom_status_control"         readonly
 
 end

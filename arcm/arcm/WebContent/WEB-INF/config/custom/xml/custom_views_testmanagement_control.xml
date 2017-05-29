@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <custom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/custom.xsd">
 
-	<view id="control" view.parameter="DISTINCT" ><!-- viewHandler="com.idsscheer.webapps.arcm.dl.framework.viewhandler.CustomControlViewHandler"> -->
+	<view id="control" view.parameter="DISTINCT" relevantForMashzoneIntegration="true"><!-- viewHandler="com.idsscheer.webapps.arcm.dl.framework.viewhandler.CustomControlViewHandler"> -->
         <viewObject id="VO_controls_1" objectType="CONTROL" isMainViewObject="true">
             <viewColumn id="client_sign" attributeType="client_sign" isSortable="true" isSelectColumn="true"/>
             <viewColumn id="client_id" attributeType="client_objid" isSortable="true" isSelectColumn="true"/>
@@ -44,6 +44,7 @@
                 <condition column.id="control_frequency" compareType="IN"/>
                 <condition column.id="control_effect" compareType="IN"/>
                 <condition column.id="control_execution" compareType="EQ"/>
+<!--                 <condition column.id="control_id" compareType="EQ"/> -->
                 <condition column.id="guid" compareType="EQ"/>
             </compoundCondition>
         </conditions>

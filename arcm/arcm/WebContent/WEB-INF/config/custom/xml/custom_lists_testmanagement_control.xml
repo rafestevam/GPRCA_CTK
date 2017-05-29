@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <custom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/custom.xsd">
-<!--
+
 	<list id="control"
           view.idref="control"
           filter.idref="control"
-          idColumn.idref="control_id"
+          idColumn.idref="obj_id"
           defaultOrderColumn.idref="name"
           allowMarkAsIssueRelevant="true"
           relatedObjectType.idref="CONTROL"
@@ -38,5 +38,5 @@
 			<buttonReference button.idref="LISTROW_DELETE"/>
 		</rowButtons>
 	</list>
--->
+
 </custom>

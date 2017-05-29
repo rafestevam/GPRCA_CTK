@@ -391,3 +391,35 @@ rule "custom_userroles_readonly[I,V]"
 		set "categderisco"                         readonly
 
 end
+
+rule "custom_userroles_readonly_man[I,V]"
+
+	salience 8800
+	no-loop true
+	
+	when
+		( user has in_general role "riskmanager" )    OR
+		( user has in_general role "controlmanager" ) OR
+		( user has in_general role "testmanager" )
+	
+	then
+		set "risk_id"                   readonly
+		set "name"                      readonly
+		set "description"               readonly
+		set "cause"                     readonly
+		set "consequence"               readonly
+		set "process"                   readonly
+		set "impact"                    readonly
+		set "probability"               readonly
+		set "finaccount"                readonly
+		set "risktype"                  readonly
+		set "categderisco"              readonly
+		set "manager_group"             readonly
+		set "documents"                 readonly
+		set "owner_group"               readonly
+		set "reviewer_group"            readonly
+		set "risk_category"             readonly
+		set "orgunit"                   readonly
+		set "appsystem"                 readonly
+
+end

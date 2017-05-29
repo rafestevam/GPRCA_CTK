@@ -1025,7 +1025,8 @@ rule "custom_set_riskclassification[I,V]"
 	no-loop true
 	
 	when
-		value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "issue"
+		( value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "issue" ) OR
+		( value comparison fulfilled: ":transient:" attr_value "action_type" "CONTAINS" value "actionplan" )
 	
 	then
 		set risk classification
